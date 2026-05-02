@@ -47,15 +47,15 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-            <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-center py-32 px-16 bg-white dark:bg-black">
+        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-black via-slate-900 to-blue-950 font-sans text-white">
+            <main className="flex w-full max-w-3xl flex-col items-center justify-center py-32 px-16">
                 <div className="flex flex-col items-center w-full gap-6 text-center">
-                    <Card className="w-full max-w-md">
+                    <Card className="w-full max-w-md bg-white/10 border-white/20 text-white backdrop-blur-md shadow-2xl">
                         <CardHeader>
-                            <CardTitle>login</CardTitle>
+                            <CardTitle className="text-3xl font-bold">Sign In</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+                            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 text-left">
                                 {errorMessage && ( // Display error message if present
                                     <p className="text-sm text-red-600 mt-1">{errorMessage}</p>
                                 )}
@@ -84,8 +84,8 @@ export default function LoginPage() {
                                     )}
                                 </div>
 
-                                <Button type="submit" className="mt-2" disabled={isSubmitting}>
-                                    {isSubmitting ? "logging in..." : "login"}
+                                <Button type="submit" className="mt-4 bg-white text-black hover:bg-gray-200 text-base font-semibold py-2" disabled={isSubmitting}>
+                                    {isSubmitting ? "Signing in..." : "Sign in"}
                                 </Button>
                             </form>
                         </CardContent>
