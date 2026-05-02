@@ -3,6 +3,7 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -128,6 +129,12 @@ export default function RegistrationPage() {
                                 <Button type="submit" className="mt-4 bg-white text-black hover:bg-gray-200 text-base font-semibold py-2" disabled={isSubmitting}>
                                     {isSubmitting ? "Registering..." : "Register"}
                                 </Button>
+                                <p className="text-sm text-center text-gray-300 mt-4">
+                                    Already have an account?{" "}
+                                    <Link href="/login" className="text-white font-medium hover:underline">
+                                        Sign in
+                                    </Link>
+                                </p>
                             </form>
                         </CardContent>
                     </Card>
