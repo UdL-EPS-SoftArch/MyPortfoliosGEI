@@ -16,7 +16,7 @@ export default function Navbar() {
 
     return (
         <nav className="absolute top-0 w-full z-50 bg-transparent text-white">
-            <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-6">
+            <div className="w-full px-6 sm:px-12 lg:px-20 py-6 flex items-center gap-6">
                 <div className="flex gap-2 font-bold w-auto text-xl items-center tracking-tight text-white">
                     MyPortfolios
                 </div>
