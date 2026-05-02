@@ -20,7 +20,7 @@ export default function Home() {
         {/* <Image src="/banner.jpg" alt="Background" fill className="object-cover" priority /> */}
       </div>
 
-      <main className="relative z-10 flex w-full flex-col items-start justify-center flex-1 px-6 sm:px-12 lg:px-20 pt-32 pb-20">
+      <main className="relative z-10 flex w-full flex-col items-start justify-center flex-1 px-8 sm:px-16 lg:px-32 xl:px-40 pt-32 pb-20">
         
         <div className="max-w-3xl">
           <h1 className="text-6xl font-extrabold tracking-tight text-white sm:text-7xl lg:text-8xl mb-8 leading-tight">
