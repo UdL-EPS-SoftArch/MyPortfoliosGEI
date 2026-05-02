@@ -24,7 +24,6 @@ export default function RegistrationPage() {
     const {
         register,
         handleSubmit,
-        watch,
         setValue,
         formState: { errors, isSubmitting },
     } = useForm<FormValues>();
@@ -34,9 +33,6 @@ export default function RegistrationPage() {
         const e = params.get("email");
         if (e) setValue("email", e);
     }, [setValue]);
-
-    // eslint-disable-next-line react-hooks/incompatible-library
-    const password = watch("password");
 
     const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
@@ -119,7 +115,7 @@ export default function RegistrationPage() {
                                         type="password"
                                         className="bg-black/20 border-white/20 text-white focus-visible:ring-white/40 h-12 px-4 placeholder-gray-400"
                                         {...register("confirmPassword", {
-                                            validate: value => value === password || "The passwords do not match"
+                                            validate: (value, formValues) => value === formValues.password || "The passwords do not match"
                                         })}
                                     />
                                     {errors.confirmPassword && (
