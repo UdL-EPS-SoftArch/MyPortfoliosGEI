@@ -25,12 +25,17 @@ export default function RegistrationPage() {
         formState: { errors, isSubmitting },
     } = useForm<FormValues>();
 
+    const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+
     const router = useRouter();
 
     const onSubmit: SubmitHandler<FormValues> = (data) => {
+        setErrorMessage(null);
         service.createUser(data as User).then(() => {
             router.push("/login");
-        })
+        }).catch((err) => {
+            setErrorMessage(err.message || "Registration failed");
+        });
     };
 
     return (
@@ -43,8 +48,11 @@ export default function RegistrationPage() {
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
+                                {errorMessage && (
+                                    <p className="text-sm text-red-600 mt-1">{errorMessage}</p>
+                                )}
                                 <div>
-                                    <Label htmlFor="name">Name</Label>
+                                    <Label htmlFor="username">Name</Label>
                                     <Input
                                         id="username"
                                         {...register("username", { required: "Username is required" })}
@@ -79,7 +87,7 @@ export default function RegistrationPage() {
                                         type="password"
                                         {...register("password", {
                                             required: "Password is required",
-                                            minLength: { value: 6, message: "Minimum 8 characters" },
+                                            minLength: { value: 8, message: "Minimum 8 characters" },
                                             maxLength: { value: 256, message: "Maximum 256 characters" }
                                         })}
                                     />
