@@ -59,10 +59,11 @@ export default function LoginPage() {
                                 {errorMessage && ( // Display error message if present
                                     <p className="text-sm text-red-600 mt-1">{errorMessage}</p>
                                 )}
-                                <div>
-                                    <Label htmlFor="username">Username</Label> {/* Changed htmlFor to username */}
+                                <div className="space-y-2">
+                                    <Label htmlFor="username" className="text-gray-300 font-medium">Username</Label>
                                     <Input
                                         id="username"
+                                        className="bg-black/20 border-white/20 text-white focus-visible:ring-white/40 h-12 px-4 placeholder-gray-400"
                                         {...register("username", { required: "Username is required" })}
                                     />
                                     {errors.username && (
@@ -70,11 +71,12 @@ export default function LoginPage() {
                                     )}
                                 </div>
 
-                                <div>
-                                    <Label htmlFor="password">Password</Label>
+                                <div className="space-y-2">
+                                    <Label htmlFor="password" className="text-gray-300 font-medium">Password</Label>
                                     <Input
                                         id="password"
                                         type="password"
+                                        className="bg-black/20 border-white/20 text-white focus-visible:ring-white/40 h-12 px-4 placeholder-gray-400"
                                         {...register("password", {
                                             required: "Password is required"
                                         })}

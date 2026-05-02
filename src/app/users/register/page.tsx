@@ -62,10 +62,11 @@ export default function RegistrationPage() {
                                 {errorMessage && (
                                     <p className="text-sm text-red-600 mt-1">{errorMessage}</p>
                                 )}
-                                <div>
-                                    <Label htmlFor="username">Name</Label>
+                                <div className="space-y-2">
+                                    <Label htmlFor="username" className="text-gray-300 font-medium">Name</Label>
                                     <Input
                                         id="username"
+                                        className="bg-black/20 border-white/20 text-white focus-visible:ring-white/40 h-12 px-4 placeholder-gray-400"
                                         {...register("username", { required: "Username is required" })}
                                     />
                                     {errors.username && (
@@ -73,11 +74,12 @@ export default function RegistrationPage() {
                                     )}
                                 </div>
 
-                                <div>
-                                    <Label htmlFor="email">Email</Label>
+                                <div className="space-y-2">
+                                    <Label htmlFor="email" className="text-gray-300 font-medium">Email</Label>
                                     <Input
                                         id="email"
                                         type="email"
+                                        className="bg-black/20 border-white/20 text-white focus-visible:ring-white/40 h-12 px-4 placeholder-gray-400"
                                         {...register("email", {
                                             required: "Email is required",
                                             pattern: {
@@ -91,11 +93,12 @@ export default function RegistrationPage() {
                                     )}
                                 </div>
 
-                                <div>
-                                    <Label htmlFor="password">Password</Label>
+                                <div className="space-y-2">
+                                    <Label htmlFor="password" className="text-gray-300 font-medium">Password</Label>
                                     <Input
                                         id="password"
                                         type="password"
+                                        className="bg-black/20 border-white/20 text-white focus-visible:ring-white/40 h-12 px-4 placeholder-gray-400"
                                         {...register("password", {
                                             required: "Password is required",
                                             minLength: { value: 8, message: "Minimum 8 characters" },
@@ -107,11 +110,12 @@ export default function RegistrationPage() {
                                     )}
                                 </div>
 
-                                <div>
-                                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                                <div className="space-y-2">
+                                    <Label htmlFor="confirmPassword" className="text-gray-300 font-medium">Confirm Password</Label>
                                     <Input
                                         id="confirmPassword"
                                         type="password"
+                                        className="bg-black/20 border-white/20 text-white focus-visible:ring-white/40 h-12 px-4 placeholder-gray-400"
                                         {...register("confirmPassword", {
                                             validate: value => value === password || "The passwords do not match"
                                         })}
