@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/app/components/authentication";
 import Loginbar from "@/app/components/loginbar";
@@ -18,15 +17,8 @@ export default function Navbar() {
     return (
         <nav className="bg-white border-b shadow-sm dark:bg-black">
             <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-6">
-                <div className="flex gap-2 font-bold w-auto">
-                    <Image
-                        className="dark:invert"
-                        src="/next.svg"
-                        alt="Next.js logo"
-                        width={80}
-                        height={16}
-                        priority
-                    /> Template
+                <div className="flex gap-2 font-bold w-auto text-xl items-center">
+                    MyPortfolios
                 </div>
 
                 <div className="flex gap-4">
