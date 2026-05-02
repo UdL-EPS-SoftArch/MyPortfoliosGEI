@@ -39,7 +39,7 @@ export default function Loginbar() {
         return () => {
             mounted = false;
         };
-    }, []);
+    }, [setUser]);
 
     if (user) {
         return (
