@@ -35,6 +35,7 @@ export default function RegistrationPage() {
         if (e) setValue("email", e);
     }, [setValue]);
 
+    // eslint-disable-next-line react-hooks/incompatible-library
     const password = watch("password");
 
     const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
