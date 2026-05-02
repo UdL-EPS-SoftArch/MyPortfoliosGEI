@@ -15,6 +15,7 @@ type FormValues = {
     username: string;
     email: string;
     password: string;
+    confirmPassword?: string;
 };
 
 export default function RegistrationPage() {
@@ -22,8 +23,11 @@ export default function RegistrationPage() {
     const {
         register,
         handleSubmit,
+        watch,
         formState: { errors, isSubmitting },
     } = useForm<FormValues>();
+
+    const password = watch("password");
 
     const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
@@ -40,8 +44,8 @@ export default function RegistrationPage() {
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-            <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-                <div className="flex flex-col items-center w-full gap-6 text-center sm:items-start sm:text-left">
+            <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-center py-32 px-16 bg-white dark:bg-black">
+                <div className="flex flex-col items-center w-full gap-6 text-center">
                     <Card className="w-full max-w-md">
                         <CardHeader>
                             <CardTitle>Register</CardTitle>
@@ -93,6 +97,20 @@ export default function RegistrationPage() {
                                     />
                                     {errors.password && (
                                         <p className="text-sm text-red-600 mt-1">{errors.password.message}</p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                                    <Input
+                                        id="confirmPassword"
+                                        type="password"
+                                        {...register("confirmPassword", {
+                                            validate: value => value === password || "The passwords do not match"
+                                        })}
+                                    />
+                                    {errors.confirmPassword && (
+                                        <p className="text-sm text-red-600 mt-1">{errors.confirmPassword.message}</p>
                                     )}
                                 </div>
 
