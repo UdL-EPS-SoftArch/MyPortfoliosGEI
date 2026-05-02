@@ -17,9 +17,9 @@ export default function Navbar() {
     return (
         <nav className="absolute top-0 w-full z-50 bg-transparent text-white">
             <div className="w-full px-8 sm:px-16 lg:px-32 xl:px-40 py-6 flex items-center gap-6">
-                <div className="flex gap-2 font-bold w-auto text-xl items-center tracking-tight text-white">
+                <Link href="/" className="flex gap-2 font-bold w-auto text-xl items-center tracking-tight text-white hover:text-gray-200 transition">
                     MyPortfolios
-                </div>
+                </Link>
 
                 <div className="flex gap-6 items-center">
                     {navLinks.map(({href, label}) => {
