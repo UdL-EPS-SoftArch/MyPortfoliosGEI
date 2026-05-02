@@ -15,7 +15,7 @@ export default function Loginbar() {
     const router = useRouter();
 
     function logout() {
-        deleteCookie("MYCOFFEE_AUTH");
+        deleteCookie("MYPORTFOLIOS_AUTH");
         setUser(null);
         router.push("/");
     }

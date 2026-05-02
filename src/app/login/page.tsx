@@ -26,7 +26,7 @@ export default function LoginPage() {
     async function login(username: string, password: string) {
         setErrorMessage(null);
         const authorization = `Basic ${btoa(`${username}:${password}`)}`;
-        setCookie("MYCOFFEE_AUTH", authorization, {
+        setCookie("MYPORTFOLIOS_AUTH", authorization, {
             path: "/",
             secure: true,
             sameSite: "strict",
@@ -41,7 +41,7 @@ export default function LoginPage() {
         login(data.username, data.password).then(() => {
             router.push(`/users/${data.username}`);
         }).catch(() => {
-            deleteCookie("MYCOFFEE_AUTH");
+            deleteCookie("MYPORTFOLIOS_AUTH");
             setErrorMessage("Login failed");
         });
     };
