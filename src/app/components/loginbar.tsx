@@ -62,11 +62,11 @@ export default function Loginbar() {
     }
 
     return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
             <Link href="/login"
-                  className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"> Login </Link>
+                  className="text-sm font-medium text-white/80 hover:text-white transition"> Sign in </Link>
             <Link href="/users/register"
-                  className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"> Register </Link>
+                  className="inline-flex items-center px-3 py-1.5 border border-white/40 text-white rounded-md text-sm hover:border-white transition"> Sign up </Link>
         </div>
     )
 

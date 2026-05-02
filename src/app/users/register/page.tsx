@@ -24,8 +24,15 @@ export default function RegistrationPage() {
         register,
         handleSubmit,
         watch,
+        setValue,
         formState: { errors, isSubmitting },
     } = useForm<FormValues>();
+
+    React.useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const e = params.get("email");
+        if (e) setValue("email", e);
+    }, [setValue]);
 
     const password = watch("password");
 

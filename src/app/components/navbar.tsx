@@ -10,38 +10,29 @@ export default function Navbar() {
     const {user} = useAuth();
 
     const navLinks = [
-        {href: "/", label: "Home"},
-        {href: "/users", label: "Users", roles: ["ROLE_USER"]}
+        {href: "/why", label: "Why MyPortfolios"},
+        {href: "/explore", label: "Explore"}
     ];
 
     return (
-        <nav className="bg-white border-b shadow-sm dark:bg-black">
+        <nav className="absolute top-0 w-full z-50 bg-transparent text-white">
             <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-6">
-                <div className="flex gap-2 font-bold w-auto text-xl items-center">
+                <div className="flex gap-2 font-bold w-auto text-xl items-center tracking-tight text-white">
                     MyPortfolios
                 </div>
 
-                <div className="flex gap-4">
-                    {navLinks
-                        .filter(({roles}) =>
-                            !roles || user?.authorities?.some(
-                                userAuth => roles.includes(userAuth.authority)))
-                        .map(({href, label}) => {
-                            const active = pathname === href;
-                            return (
-                                <Link
-                                    key={href}
-                                    href={href}
-                                    className={
-                                        active
-                                            ? "text-blue-600 font-medium border-b-2 border-blue-600 pb-1"
-                                            : "text-gray-600 hover:text-gray-900 transition"
-                                    }
-                                >
-                                    {label}
-                                </Link>
-                            );
-                        })}
+                <div className="flex gap-6 items-center">
+                    {navLinks.map(({href, label}) => {
+                        return (
+                            <Link
+                                key={href}
+                                href={href}
+                                className="text-sm font-medium text-white/80 hover:text-white transition"
+                            >
+                                {label}
+                            </Link>
+                        );
+                    })}
                 </div>
 
                 <div className="ml-auto">

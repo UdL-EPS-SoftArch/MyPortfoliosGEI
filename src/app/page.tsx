@@ -1,39 +1,53 @@
+"use client";
+
 import Image from "next/image";
-import Link from "next/link";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const [email, setEmail] = useState("");
+  const router = useRouter();
+
+  const handleSignup = (e: React.FormEvent) => {
+    e.preventDefault();
+    router.push(`/users/register?email=${encodeURIComponent(email)}`);
+  };
+
   return (
-    <div className="flex min-h-screen flex-col items-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex w-full max-w-5xl flex-col items-center py-20 px-6 sm:px-16 text-center">
-        
-        <h1 className="text-5xl font-extrabold tracking-tight text-black dark:text-white sm:text-6xl mb-6">
-          Welcome to MyPortfolios
-        </h1>
-        
-        <p className="max-w-2xl text-xl leading-8 text-zinc-600 dark:text-zinc-400 mb-10">
-          A collaborative platform for creators to organize projects, share visual content, and build stunning digital portfolios. 
-          Share your assets with the world and connect with others.
-        </p>
+    <div className="relative flex min-h-screen flex-col items-start bg-gradient-to-br from-black via-slate-900 to-blue-950 font-sans text-white overflow-hidden">
+      {/* Optional: Place banner.jpg as an absolute background image here */}
+      <div className="absolute inset-0 z-0 opacity-40 mix-blend-overlay">
+        {/* <Image src="/banner.jpg" alt="Background" fill className="object-cover" priority /> */}
+      </div>
 
-        <div className="flex gap-4 mb-16">
-          <Link
-            href="/users/register"
-            className="rounded-full bg-blue-600 px-8 py-4 text-lg font-semibold text-white transition-colors hover:bg-blue-700 shadow-lg"
-          >
-            Get Started
-          </Link>
-        </div>
+      <main className="relative z-10 flex w-full max-w-7xl flex-col items-start justify-center flex-1 px-6 sm:px-16 lg:px-24 pt-32 pb-20">
+        
+        <div className="max-w-3xl">
+          <h1 className="text-6xl font-extrabold tracking-tight text-white sm:text-7xl lg:text-8xl mb-8 leading-tight">
+            Build your digital legacy.
+          </h1>
+          
+          <p className="max-w-2xl text-xl leading-8 text-gray-300 mb-12">
+            MyPortfolios is the premier platform for creators. Organize your projects, showcase visual assets, and collaborate securely. 
+            Join the community and start building your stunning portfolio today.
+          </p>
 
-        <div className="w-full max-w-4xl overflow-hidden rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-zinc-900 flex items-center justify-center min-h-[400px]">
-           {/* Place your banner.jpg in the /public folder */}
-           <Image 
-             src="/banner.jpg" 
-             alt="MyPortfolios Banner" 
-             width={1200} 
-             height={600} 
-             className="w-full h-auto object-cover"
-             priority
-           />
+          <form onSubmit={handleSignup} className="flex flex-col sm:flex-row gap-4 max-w-xl">
+            <input
+              type="email"
+              required
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="flex-1 rounded-md border border-white/20 bg-white/10 px-5 py-4 text-lg text-white placeholder-gray-400 backdrop-blur-sm focus:border-white focus:outline-none focus:ring-1 focus:ring-white transition"
+            />
+            <button
+              type="submit"
+              className="rounded-md bg-white text-black px-8 py-4 text-lg font-bold hover:bg-gray-200 transition shadow-lg"
+            >
+              Sign up for MyPortfolios
+            </button>
+          </form>
         </div>
 
       </main>
