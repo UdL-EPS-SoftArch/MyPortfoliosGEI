@@ -42,3 +42,52 @@ export async function postHal(path: string, body: Resource, authProvider: { getA
     }
     return halfred.parse(await res.json());
 }
+export async function putHal(path: string, body: Resource, authProvider: { getAuth: () => Promise<string | null> }) {
+    const url = path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
+    const authorization = await authProvider.getAuth();
+    const res = await fetch(url, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/hal+json",
+            ...(authorization ? { Authorization: authorization } : {}), },
+        body: JSON.stringify(body),
+        cache: "no-store",
+    });
+    if (!res.ok) {
+        throw new Error(`HTTP ${res.status} putting ${JSON.stringify(body)} to ${url}`)
+    }
+    return halfred.parse(await res.json());
+}
+
+export async function patchHal(path: string, body: Resource, authProvider: { getAuth: () => Promise<string | null> }) {
+    const url = path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
+    const authorization = await authProvider.getAuth();
+    const res = await fetch(url, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/hal+json",
+            ...(authorization ? { Authorization: authorization } : {}), },
+        body: JSON.stringify(body),
+        cache: "no-store",
+    });
+    if (!res.ok) {
+        throw new Error(`HTTP ${res.status} patching ${JSON.stringify(body)} to ${url}`)
+    }
+    return halfred.parse(await res.json());
+}
+
+export async function deleteHal(path: string, authProvider: { getAuth: () => Promise<string | null> }) {
+    const url = path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
+    const authorization = await authProvider.getAuth();
+    const res = await fetch(url, {
+        method: "DELETE",
+        headers: {
+            ...(authorization ? { Authorization: authorization } : {}), },
+        cache: "no-store",
+    });
+    if (!res.ok) {
+        throw new Error(`HTTP ${res.status} deleting ${url}`);
+    }
+}
