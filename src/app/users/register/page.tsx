@@ -3,6 +3,7 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +16,7 @@ type FormValues = {
     username: string;
     email: string;
     password: string;
+    confirmPassword?: string;
 };
 
 export default function RegistrationPage() {
@@ -22,31 +24,47 @@ export default function RegistrationPage() {
     const {
         register,
         handleSubmit,
+        setValue,
         formState: { errors, isSubmitting },
     } = useForm<FormValues>();
+
+    React.useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const e = params.get("email");
+        if (e) setValue("email", e);
+    }, [setValue]);
+
+    const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
     const router = useRouter();
 
     const onSubmit: SubmitHandler<FormValues> = (data) => {
+        setErrorMessage(null);
         service.createUser(data as User).then(() => {
             router.push("/login");
-        })
+        }).catch((err) => {
+            setErrorMessage(err.message || "Registration failed");
+        });
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-            <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-                <div className="flex flex-col items-center w-full gap-6 text-center sm:items-start sm:text-left">
-                    <Card className="w-full max-w-md">
+        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-black via-slate-900 to-blue-950 font-sans text-white">
+            <main className="flex w-full max-w-3xl flex-col items-center justify-center py-32 px-16">
+                <div className="flex flex-col items-center w-full gap-6 text-center">
+                    <Card className="w-full max-w-md bg-white/10 border-white/20 text-white backdrop-blur-md shadow-2xl">
                         <CardHeader>
-                            <CardTitle>Register</CardTitle>
+                            <CardTitle className="text-3xl font-bold">Register</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
-                                <div>
-                                    <Label htmlFor="name">Name</Label>
+                            <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 text-left">
+                                {errorMessage && (
+                                    <p className="text-sm text-red-600 mt-1">{errorMessage}</p>
+                                )}
+                                <div className="space-y-2">
+                                    <Label htmlFor="username" className="text-gray-300 font-medium">Name</Label>
                                     <Input
                                         id="username"
+                                        className="bg-black/20 border-white/20 text-white focus-visible:ring-white/40 h-12 px-4 placeholder-gray-400"
                                         {...register("username", { required: "Username is required" })}
                                     />
                                     {errors.username && (
@@ -54,11 +72,12 @@ export default function RegistrationPage() {
                                     )}
                                 </div>
 
-                                <div>
-                                    <Label htmlFor="email">Email</Label>
+                                <div className="space-y-2">
+                                    <Label htmlFor="email" className="text-gray-300 font-medium">Email</Label>
                                     <Input
                                         id="email"
                                         type="email"
+                                        className="bg-black/20 border-white/20 text-white focus-visible:ring-white/40 h-12 px-4 placeholder-gray-400"
                                         {...register("email", {
                                             required: "Email is required",
                                             pattern: {
@@ -72,14 +91,15 @@ export default function RegistrationPage() {
                                     )}
                                 </div>
 
-                                <div>
-                                    <Label htmlFor="password">Password</Label>
+                                <div className="space-y-2">
+                                    <Label htmlFor="password" className="text-gray-300 font-medium">Password</Label>
                                     <Input
                                         id="password"
                                         type="password"
+                                        className="bg-black/20 border-white/20 text-white focus-visible:ring-white/40 h-12 px-4 placeholder-gray-400"
                                         {...register("password", {
                                             required: "Password is required",
-                                            minLength: { value: 6, message: "Minimum 8 characters" },
+                                            minLength: { value: 8, message: "Minimum 8 characters" },
                                             maxLength: { value: 256, message: "Maximum 256 characters" }
                                         })}
                                     />
@@ -88,9 +108,30 @@ export default function RegistrationPage() {
                                     )}
                                 </div>
 
-                                <Button type="submit" className="mt-2" disabled={isSubmitting}>
+                                <div className="space-y-2">
+                                    <Label htmlFor="confirmPassword" className="text-gray-300 font-medium">Confirm Password</Label>
+                                    <Input
+                                        id="confirmPassword"
+                                        type="password"
+                                        className="bg-black/20 border-white/20 text-white focus-visible:ring-white/40 h-12 px-4 placeholder-gray-400"
+                                        {...register("confirmPassword", {
+                                            validate: (value, formValues) => value === formValues.password || "The passwords do not match"
+                                        })}
+                                    />
+                                    {errors.confirmPassword && (
+                                        <p className="text-sm text-red-600 mt-1">{errors.confirmPassword.message}</p>
+                                    )}
+                                </div>
+
+                                <Button type="submit" className="mt-4 bg-white text-black hover:bg-gray-200 text-base font-semibold py-2" disabled={isSubmitting}>
                                     {isSubmitting ? "Registering..." : "Register"}
                                 </Button>
+                                <p className="text-sm text-center text-gray-300 mt-4">
+                                    Already have an account?{" "}
+                                    <Link href="/login" className="text-white font-medium hover:underline">
+                                        Sign in
+                                    </Link>
+                                </p>
                             </form>
                         </CardContent>
                     </Card>
