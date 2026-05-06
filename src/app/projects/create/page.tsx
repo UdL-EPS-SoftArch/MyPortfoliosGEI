@@ -1,11 +1,16 @@
 "use client";
 
+import { ProjectService } from "@/api/projectApi";
+import { useAuth } from "@/app/components/authentication";
 import { ProjectForm } from "../components/project-form";
 import { Project } from "@/types/project";
 
 export default function CreateProjectPage() {
+    const { authProvider } = useAuth();
+
     const handleSubmit = async (data: Partial<Project>) => {
-        // TODO: conectar con la API
+        const service = new ProjectService(authProvider);
+        await service.createProject(data);
     };
 
     return (
