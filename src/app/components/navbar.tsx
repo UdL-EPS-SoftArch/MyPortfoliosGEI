@@ -1,61 +1,49 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useAuth } from "@/app/components/authentication";
 import Loginbar from "@/app/components/loginbar";
 
 export default function Navbar() {
     const pathname = usePathname();
-    const {user} = useAuth();
 
     const navLinks = [
-        {href: "/", label: "Home"},
+        {href: "/why", label: "Why MyPortfolios"},
+        {href: "/explore", label: "Explore"},
         {href: "/portfolio", label: "Portfolio"},
         {href: "/users", label: "Users", roles: ["ROLE_USER"]}
     ];
 
+    const isAuthPage = pathname === "/login" || pathname === "/users/register";
+
     return (
-        <nav className="bg-white border-b shadow-sm dark:bg-black">
-            <div className="max-w-7xl mx-auto px-6 py-4 flex items-center gap-6">
-                <div className="flex gap-2 font-bold w-auto">
-                    <Image
-                        className="dark:invert"
-                        src="/next.svg"
-                        alt="Next.js logo"
-                        width={80}
-                        height={16}
-                        priority
-                    /> Template
-                </div>
+        <nav className="absolute top-0 w-full z-50 bg-transparent text-white">
+            <div className="w-full px-8 sm:px-16 lg:px-32 xl:px-40 py-6 flex items-center gap-6">
+                <Link href="/" className="flex gap-2 font-bold w-auto text-xl items-center tracking-tight text-white hover:text-gray-200 transition">
+                    MyPortfolios
+                </Link>
 
-                <div className="flex gap-4">
-                    {navLinks
-                        .filter(({roles}) =>
-                            !roles || user?.authorities?.some(
-                                userAuth => roles.includes(userAuth.authority)))
-                        .map(({href, label}) => {
-                            const active = pathname === href;
-                            return (
-                                <Link
-                                    key={href}
-                                    href={href}
-                                    className={
-                                        active
-                                            ? "text-blue-600 font-medium border-b-2 border-blue-600 pb-1"
-                                            : "text-gray-600 hover:text-gray-900 transition"
-                                    }
-                                >
-                                    {label}
-                                </Link>
-                            );
-                        })}
-                </div>
+                {!isAuthPage && (
+                    <>
+                        <div className="flex gap-6 items-center">
+                            {navLinks.map(({href, label}) => {
+                                return (
+                                    <Link
+                                        key={href}
+                                        href={href}
+                                        className="text-sm font-medium text-white/80 hover:text-white transition"
+                                    >
+                                        {label}
+                                    </Link>
+                                );
+                            })}
+                        </div>
 
-                <div className="ml-auto">
-                    <Loginbar/>
-                </div>
+                        <div className="ml-auto">
+                            <Loginbar/>
+                        </div>
+                    </>
+                )}
 
             </div>
         </nav>
