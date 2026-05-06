@@ -1,15 +1,10 @@
-import Link from "next/link";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-
-// TODO: Remove mock data and restore API calls
-const mockUsers = [
-    { username: "pedro", portfolioCount: 4 },
-    { username: "maria", portfolioCount: 2 },
-    { username: "carlos", portfolioCount: 3 },
-];
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { PortfolioService } from "@/api/portfolioApi";
+import { serverAuthProvider } from "@/lib/authProvider";
 
 export default async function PortfolioListPage() {
-    const users = mockUsers;
+    const service = new PortfolioService(serverAuthProvider);
+    const portfolios = await service.getPortfolios();
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -17,20 +12,31 @@ export default async function PortfolioListPage() {
                 <div className="flex flex-col items-center w-full gap-6 text-center sm:items-start sm:text-left">
                     <h1 className="text-2xl font-semibold mb-6">Portfolios</h1>
 
-                    <div className="grid gap-4 w-full sm:grid-cols-2">
-                        {users.map((user, i) => (
-                            <Link key={i} href={`/portfolio/${user.username}`}>
-                                <Card className="hover:shadow-md transition cursor-pointer h-full">
+                    {portfolios.length === 0 ? (
+                        <p className="text-gray-500">No portfolios yet.</p>
+                    ) : (
+                        <div className="grid gap-4 w-full sm:grid-cols-2">
+                            {portfolios.map((portfolio, i) => (
+                                <Card key={i} className="h-full">
                                     <CardHeader>
-                                        <CardTitle>{user.username}</CardTitle>
-                                        <CardDescription>
-                                            {user.portfolioCount} portfolio{user.portfolioCount !== 1 ? "s" : ""}
-                                        </CardDescription>
+                                        <CardTitle>{portfolio.name}</CardTitle>
+                                        {portfolio.description && (
+                                            <CardDescription>{portfolio.description}</CardDescription>
+                                        )}
                                     </CardHeader>
+                                    {portfolio.image && (
+                                        <CardContent>
+                                            <img
+                                                src={portfolio.image}
+                                                alt={portfolio.name}
+                                                className="w-full h-40 object-cover rounded-md"
+                                            />
+                                        </CardContent>
+                                    )}
                                 </Card>
-                            </Link>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </main>
         </div>
