@@ -3,6 +3,7 @@
 import { useEffect, useState, use } from "react";
 import { ProjectService } from "@/api/projectApi";
 import { useAuth } from "@/app/components/authentication";
+import { ProjectForm } from "../../components/project-form";
 import { Project } from "@/types/project";
 import { Loader2 } from "lucide-react";
 
@@ -28,8 +29,14 @@ export default function EditProjectPage({ params }: EditProjectPageProps) {
                 setLoading(false);
             }
         };
+
         fetchProject();
     }, [id, authProvider]);
+
+    const handleSubmit = async (data: Partial<Project>) => {
+        const service = new ProjectService(authProvider);
+        await service.updateProject(id, data);
+    };
 
     if (loading) {
         return (
@@ -39,5 +46,24 @@ export default function EditProjectPage({ params }: EditProjectPageProps) {
         );
     }
 
-    return null; // Temporalment fins al següent commit
+    if (!project) {
+        return (
+            <div className="container mx-auto px-6 py-20 text-center">
+                <h1 className="text-2xl font-bold">Project not found</h1>
+                <p className="text-muted-foreground mt-2">The project you are looking for does not exist or you dont have permission to view it.</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="container mx-auto px-6 py-12">
+            <div className="mb-8 text-center">
+                <h1 className="text-4xl font-extrabold tracking-tight">Edit Project</h1>
+                <p className="text-muted-foreground mt-2 text-lg">
+                    Update the details of <span className="font-semibold text-foreground">{project.name}</span>.
+                </p>
+            </div>
+            <ProjectForm initialData={project} onSubmit={handleSubmit} />
+        </div>
+    );
 }
