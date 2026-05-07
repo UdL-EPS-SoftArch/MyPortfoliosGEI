@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PortfolioService } from "@/api/portfolioApi";
 import { serverAuthProvider } from "@/lib/authProvider";
 import { User } from "@/types/user";
+import EditPortfolioButton from "@/app/portfolio/components/edit-button";
 
 export default async function PortfolioDetailPage(props: { params: Promise<{ id: string }> }) {
     const service = new PortfolioService(serverAuthProvider);
@@ -20,7 +21,10 @@ export default async function PortfolioDetailPage(props: { params: Promise<{ id:
             <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
                 <div className="flex flex-col items-center w-full gap-6 text-center sm:items-start sm:text-left">
                     <div className="space-y-4 w-full">
-                        <h1 className="text-2xl font-semibold">{portfolio.name}</h1>
+                        <div className="flex items-center justify-between gap-4">
+                            <h1 className="text-2xl font-semibold">{portfolio.name}</h1>
+                            <EditPortfolioButton portfolioId={id} creatorUsername={creator?.username} />
+                        </div>
 
                         {portfolio.description && (
                             <p className="text-gray-700">{portfolio.description}</p>

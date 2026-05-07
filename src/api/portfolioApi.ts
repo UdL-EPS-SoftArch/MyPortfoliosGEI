@@ -1,4 +1,4 @@
-import { getHal, mergeHal, mergeHalArray, postHal } from "./halClient";
+import { getHal, mergeHal, mergeHalArray, patchHal, postHal } from "./halClient";
 import type { AuthProvider } from "@/lib/authProvider";
 import { Portfolio } from "@/types/portfolio";
 import { User } from "@/types/user";
@@ -18,15 +18,20 @@ export class PortfolioService {
         return mergeHal<Portfolio>(resource);
     }
 
-    async getPortfoliosByOwnedBy(owner: User): Promise<Portfolio[]> {
+    async getPortfoliosByCreator(creator: User): Promise<Portfolio[]> {
         const resource = await getHal(
-            `/portfolios/search/findByOwnedBy?user=${owner.uri}`, this.authProvider);
+            `/portfolios/search/findByCreator?user=${creator.uri}`, this.authProvider);
         const embedded = resource.embeddedArray('portfolios') || [];
         return mergeHalArray<Portfolio>(embedded);
     }
 
     async createPortfolio(portfolio: Portfolio): Promise<Portfolio> {
         const resource = await postHal('/portfolios', portfolio, this.authProvider);
+        return mergeHal<Portfolio>(resource);
+    }
+
+    async updatePortfolio(id: string, partial: Partial<Portfolio>): Promise<Portfolio> {
+        const resource = await patchHal(`/portfolios/${id}`, partial, this.authProvider);
         return mergeHal<Portfolio>(resource);
     }
 
