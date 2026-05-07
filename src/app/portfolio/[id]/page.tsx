@@ -3,6 +3,7 @@ import { PortfolioService } from "@/api/portfolioApi";
 import { serverAuthProvider } from "@/lib/authProvider";
 import { User } from "@/types/user";
 import EditPortfolioButton from "@/app/portfolio/components/edit-button";
+import DeletePortfolioButton from "@/app/portfolio/components/delete-button";
 
 export default async function PortfolioDetailPage(props: { params: Promise<{ id: string }> }) {
     const service = new PortfolioService(serverAuthProvider);
@@ -23,7 +24,10 @@ export default async function PortfolioDetailPage(props: { params: Promise<{ id:
                     <div className="space-y-4 w-full">
                         <div className="flex items-center justify-between gap-4">
                             <h1 className="text-2xl font-semibold">{portfolio.name}</h1>
-                            <EditPortfolioButton portfolioId={id} creatorUsername={creator?.username} />
+                            <div className="flex items-center gap-2">
+                                <EditPortfolioButton portfolioId={id} creatorUsername={creator?.username} />
+                                <DeletePortfolioButton portfolioId={id} creatorUsername={creator?.username} />
+                            </div>
                         </div>
 
                         {portfolio.description && (

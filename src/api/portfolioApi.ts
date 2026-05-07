@@ -1,4 +1,4 @@
-import { getHal, mergeHal, mergeHalArray, patchHal, postHal } from "./halClient";
+import { deleteHal, getHal, mergeHal, mergeHalArray, patchHal, postHal } from "./halClient";
 import type { AuthProvider } from "@/lib/authProvider";
 import { Portfolio } from "@/types/portfolio";
 import { User } from "@/types/user";
@@ -33,6 +33,10 @@ export class PortfolioService {
     async updatePortfolio(id: string, partial: Partial<Portfolio>): Promise<Portfolio> {
         const resource = await patchHal(`/portfolios/${id}`, partial, this.authProvider);
         return mergeHal<Portfolio>(resource);
+    }
+
+    async deletePortfolio(id: string): Promise<void> {
+        await deleteHal(`/portfolios/${id}`, this.authProvider);
     }
 
     async getPortfolioRelation<T>(portfolio: Portfolio, relation: string): Promise<T> {
