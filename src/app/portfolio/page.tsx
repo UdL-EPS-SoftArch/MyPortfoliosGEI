@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { PortfolioService } from "@/api/portfolioApi";
 import { serverAuthProvider } from "@/lib/authProvider";
@@ -16,25 +17,30 @@ export default async function PortfolioListPage() {
                         <p className="text-gray-500">No portfolios yet.</p>
                     ) : (
                         <div className="grid gap-4 w-full sm:grid-cols-2">
-                            {portfolios.map((portfolio, i) => (
-                                <Card key={i} className="h-full">
-                                    <CardHeader>
-                                        <CardTitle>{portfolio.name}</CardTitle>
-                                        {portfolio.description && (
-                                            <CardDescription>{portfolio.description}</CardDescription>
-                                        )}
-                                    </CardHeader>
-                                    {portfolio.image && (
-                                        <CardContent>
-                                            <img
-                                                src={portfolio.image}
-                                                alt={portfolio.name}
-                                                className="w-full h-40 object-cover rounded-md"
-                                            />
-                                        </CardContent>
-                                    )}
-                                </Card>
-                            ))}
+                            {portfolios.map((portfolio, i) => {
+                                const id = portfolio.uri?.split("/").pop();
+                                return (
+                                    <Link key={i} href={`/portfolio/${id}`}>
+                                        <Card className="hover:shadow-md transition cursor-pointer h-full">
+                                            <CardHeader>
+                                                <CardTitle>{portfolio.name}</CardTitle>
+                                                {portfolio.description && (
+                                                    <CardDescription>{portfolio.description}</CardDescription>
+                                                )}
+                                            </CardHeader>
+                                            {portfolio.image && (
+                                                <CardContent>
+                                                    <img
+                                                        src={portfolio.image}
+                                                        alt={portfolio.name}
+                                                        className="w-full h-40 object-cover rounded-md"
+                                                    />
+                                                </CardContent>
+                                            )}
+                                        </Card>
+                                    </Link>
+                                );
+                            })}
                         </div>
                     )}
                 </div>
