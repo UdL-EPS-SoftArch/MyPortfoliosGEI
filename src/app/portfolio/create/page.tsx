@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -9,13 +10,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { PortfolioService } from "@/api/portfolioApi";
-import { Portfolio } from "@/types/portfolio";
+import { Portfolio, Visibility } from "@/types/portfolio";
 import { clientAuthProvider } from "@/lib/authProvider";
 
 type FormValues = {
     name: string;
     description: string;
-    image: string;
+    visibility: Visibility;
 };
 
 export default function CreatePortfolioPage() {
@@ -27,14 +28,16 @@ export default function CreatePortfolioPage() {
         register,
         handleSubmit,
         formState: { errors, isSubmitting },
-    } = useForm<FormValues>();
+    } = useForm<FormValues>({
+        defaultValues: { visibility: "PUBLIC" },
+    });
 
     const onSubmit: SubmitHandler<FormValues> = (data) => {
         setErrorMessage(null);
         service.createPortfolio(data as Portfolio).then(() => {
             router.push("/portfolio");
-        }).catch(() => {
-            setErrorMessage("Error al crear el portfolio");
+        }).catch((error: Error) => {
+            setErrorMessage(error.message || "Failed to create portfolio");
         });
     };
 
@@ -44,19 +47,19 @@ export default function CreatePortfolioPage() {
                 <div className="flex flex-col items-center w-full gap-6 text-center sm:items-start sm:text-left">
                     <Card className="w-full max-w-md">
                         <CardHeader>
-                            <CardTitle>Nuevo Portfolio</CardTitle>
+                            <CardTitle>New Portfolio</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
                                 {errorMessage && (
-                                    <p className="text-sm text-red-600 mt-1">{errorMessage}</p>
+                                    <p className="text-sm text-red-600">{errorMessage}</p>
                                 )}
 
                                 <div>
-                                    <Label htmlFor="name">Nombre</Label>
+                                    <Label htmlFor="name">Name</Label>
                                     <Input
                                         id="name"
-                                        {...register("name", { required: "El nombre es obligatorio" })}
+                                        {...register("name", { required: "Name is required" })}
                                     />
                                     {errors.name && (
                                         <p className="text-sm text-red-600 mt-1">{errors.name.message}</p>
@@ -64,10 +67,15 @@ export default function CreatePortfolioPage() {
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="description">Descripción</Label>
+                                    <Label htmlFor="description">Description</Label>
                                     <Textarea
                                         id="description"
-                                        {...register("description", { required: "La descripción es obligatoria" })}
+                                        {...register("description", {
+                                            maxLength: {
+                                                value: 2000,
+                                                message: "Description must be 2000 characters or less",
+                                            },
+                                        })}
                                     />
                                     {errors.description && (
                                         <p className="text-sm text-red-600 mt-1">{errors.description.message}</p>
@@ -75,26 +83,28 @@ export default function CreatePortfolioPage() {
                                 </div>
 
                                 <div>
-                                    <Label htmlFor="image">URL de imagen</Label>
-                                    <Input
-                                        id="image"
-                                        type="url"
-                                        placeholder="https://ejemplo.com/imagen.jpg"
-                                        {...register("image", {
-                                            pattern: {
-                                                value: /^https?:\/\/.+/,
-                                                message: "Introduce una URL válida",
-                                            },
-                                        })}
-                                    />
-                                    {errors.image && (
-                                        <p className="text-sm text-red-600 mt-1">{errors.image.message}</p>
-                                    )}
+                                    <Label htmlFor="visibility">Visibility</Label>
+                                    <select
+                                        id="visibility"
+                                        className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm"
+                                        {...register("visibility", { required: true })}
+                                    >
+                                        <option value="PUBLIC">Public</option>
+                                        <option value="UNLISTED">Unlisted</option>
+                                        <option value="PRIVATE">Private</option>
+                                    </select>
                                 </div>
 
-                                <Button type="submit" className="mt-2" disabled={isSubmitting}>
-                                    {isSubmitting ? "Creando..." : "Crear Portfolio"}
-                                </Button>
+                                <div className="flex gap-2 mt-2">
+                                    <Button type="submit" disabled={isSubmitting} className="flex-1">
+                                        {isSubmitting ? "Creating..." : "Create Portfolio"}
+                                    </Button>
+                                    <Link href="/portfolio" className="flex-1">
+                                        <Button type="button" variant="outline" className="w-full">
+                                            Cancel
+                                        </Button>
+                                    </Link>
+                                </div>
                             </form>
                         </CardContent>
                     </Card>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { PortfolioService } from "@/api/portfolioApi";
 import { serverAuthProvider } from "@/lib/authProvider";
+import CreatePortfolioButton from "@/app/portfolio/components/create-button";
 
 export default async function PortfolioListPage() {
     const service = new PortfolioService(serverAuthProvider);
@@ -11,7 +12,10 @@ export default async function PortfolioListPage() {
         <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
             <main className="flex min-h-screen w-full max-w-3xl flex-col items-center py-32 px-16 bg-white dark:bg-black sm:items-start">
                 <div className="flex flex-col items-center w-full gap-6 text-center sm:items-start sm:text-left">
-                    <h1 className="text-2xl font-semibold mb-6">Portfolios</h1>
+                    <div className="flex items-center justify-between w-full mb-6">
+                        <h1 className="text-2xl font-semibold">Portfolios</h1>
+                        <CreatePortfolioButton />
+                    </div>
 
                     {portfolios.length === 0 ? (
                         <p className="text-gray-500">No portfolios yet.</p>

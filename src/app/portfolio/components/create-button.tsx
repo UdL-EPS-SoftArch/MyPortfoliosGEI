@@ -5,16 +5,16 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/app/components/authentication";
 import { Plus } from "lucide-react";
 
-export default function CreatePortfolioButton({ ownerUsername }: { ownerUsername: string }) {
+export default function CreatePortfolioButton() {
     const { user } = useAuth();
 
-    if (!user || user.username !== ownerUsername) return null;
+    if (!user) return null;
 
     return (
         <Link href="/portfolio/create">
             <Button size="sm" className="gap-1">
                 <Plus className="h-4 w-4" />
-                Nuevo Portfolio
+                New Portfolio
             </Button>
         </Link>
     );
