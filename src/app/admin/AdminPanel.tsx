@@ -38,6 +38,10 @@ type Tab = "reports" | "portfolios" | "projects" | "assets";
 
 const visibilityOptions = ["PUBLIC", "PRIVATE", "RESTRICTED"];
 
+function isDemoItem(uri: string) {
+    return uri.startsWith("demo:");
+}
+
 function buildDrafts(items: Array<AssetEntity | PortfolioEntity | ProjectEntity>) {
     return Object.fromEntries(items.map((item) => [item.uri, {
         name: item.name ?? "",
@@ -112,6 +116,11 @@ export default function AdminPanel({
     async function savePortfolio(portfolio: PortfolioEntity) {
         const draft = portfolioDrafts[portfolio.uri];
         await runAction(portfolio.uri, "Portfolio updated", "Could not update portfolio", async () => {
+            if (isDemoItem(portfolio.uri)) {
+                setPortfolios((items) => items.map((item) => item.uri === portfolio.uri ? { ...item, ...draft } : item));
+                return;
+            }
+
             const service = new PortfolioService(clientAuthProvider());
             const updated = await service.updatePortfolio(portfolio, {
                 name: draft.name,
@@ -125,6 +134,11 @@ export default function AdminPanel({
     async function deletePortfolio(portfolio: PortfolioEntity) {
         if (!window.confirm(`Delete ${portfolio.name}?`)) return;
         await runAction(portfolio.uri, "Portfolio deleted", "Could not delete portfolio", async () => {
+            if (isDemoItem(portfolio.uri)) {
+                setPortfolios((items) => items.filter((item) => item.uri !== portfolio.uri));
+                return;
+            }
+
             const service = new PortfolioService(clientAuthProvider());
             await service.deletePortfolio(portfolio);
             setPortfolios((items) => items.filter((item) => item.uri !== portfolio.uri));
@@ -134,6 +148,11 @@ export default function AdminPanel({
     async function saveProject(project: ProjectEntity) {
         const draft = projectDrafts[project.uri];
         await runAction(project.uri, "Project updated", "Could not update project", async () => {
+            if (isDemoItem(project.uri)) {
+                setProjects((items) => items.map((item) => item.uri === project.uri ? { ...item, ...draft } : item));
+                return;
+            }
+
             const service = new ProjectService(clientAuthProvider());
             const updated = await service.updateProject(project, {
                 name: draft.name,
@@ -148,6 +167,11 @@ export default function AdminPanel({
     async function deleteProject(project: ProjectEntity) {
         if (!window.confirm(`Delete ${project.name}?`)) return;
         await runAction(project.uri, "Project deleted", "Could not delete project", async () => {
+            if (isDemoItem(project.uri)) {
+                setProjects((items) => items.filter((item) => item.uri !== project.uri));
+                return;
+            }
+
             const service = new ProjectService(clientAuthProvider());
             await service.deleteProject(project);
             setProjects((items) => items.filter((item) => item.uri !== project.uri));
@@ -157,6 +181,11 @@ export default function AdminPanel({
     async function saveAsset(asset: AssetEntity) {
         const draft = assetDrafts[asset.uri];
         await runAction(asset.uri, "Asset updated", "Could not update asset", async () => {
+            if (isDemoItem(asset.uri)) {
+                setAssets((items) => items.map((item) => item.uri === asset.uri ? { ...item, ...draft } : item));
+                return;
+            }
+
             const service = new AssetService(clientAuthProvider());
             const updated = await service.updateAsset(asset, {
                 name: draft.name,
@@ -169,6 +198,11 @@ export default function AdminPanel({
     async function deleteAsset(asset: AssetEntity) {
         if (!window.confirm(`Delete ${asset.name}?`)) return;
         await runAction(asset.uri, "Asset deleted", "Could not delete asset", async () => {
+            if (isDemoItem(asset.uri)) {
+                setAssets((items) => items.filter((item) => item.uri !== asset.uri));
+                return;
+            }
+
             const service = new AssetService(clientAuthProvider());
             await service.deleteAsset(asset);
             setAssets((items) => items.filter((item) => item.uri !== asset.uri));
@@ -178,6 +212,11 @@ export default function AdminPanel({
     async function resolveReport(project: ProjectEntity) {
         updateDraft(setProjectDrafts, project.uri, { flagged: false });
         await runAction(project.uri, "Report resolved", "Could not resolve report", async () => {
+            if (isDemoItem(project.uri)) {
+                setProjects((items) => items.map((item) => item.uri === project.uri ? { ...item, flagged: false } : item));
+                return;
+            }
+
             const service = new ProjectService(clientAuthProvider());
             const updated = await service.updateProject(project, { flagged: false });
             setProjects((items) => items.map((item) => item.uri === project.uri ? toProjectEntity(updated) : item));

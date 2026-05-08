@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import AdminPanel from "@/app/admin/AdminPanel";
+import { demoAssets, demoPortfolios, demoProjects } from "@/app/admin/testData";
 import { AssetService } from "@/api/assetApi";
 import { PortfolioService } from "@/api/portfolioApi";
 import { ProjectService } from "@/api/projectApi";
@@ -56,6 +57,10 @@ function toProjectEntity(project: Project): ProjectEntity {
     };
 }
 
+function withDemoData<T>(items: T[], demoItems: T[]) {
+    return process.env.NODE_ENV === "production" || items.length > 0 ? items : demoItems;
+}
+
 export default async function AdminPage() {
     const userService = new UsersService(serverAuthProvider);
     const currentUser = await userService.getCurrentUser();
@@ -92,12 +97,20 @@ export default async function AdminPage() {
         loadErrors.push("Assets could not be loaded.");
     }
 
+    const initialAssets = withDemoData(assets.map(toAssetEntity), demoAssets);
+    const initialPortfolios = withDemoData(portfolios.map(toPortfolioEntity), demoPortfolios);
+    const initialProjects = withDemoData(projects.map(toProjectEntity), demoProjects);
+
+    if (process.env.NODE_ENV !== "production" && (assets.length === 0 || portfolios.length === 0 || projects.length === 0)) {
+        loadErrors.push("Showing development test data for empty collections.");
+    }
+
     return (
         <AdminPanel
             currentUser={toUserEntity(currentUser)}
-            initialAssets={assets.map(toAssetEntity)}
-            initialPortfolios={portfolios.map(toPortfolioEntity)}
-            initialProjects={projects.map(toProjectEntity)}
+            initialAssets={initialAssets}
+            initialPortfolios={initialPortfolios}
+            initialProjects={initialProjects}
             loadErrors={loadErrors}
         />
     );
