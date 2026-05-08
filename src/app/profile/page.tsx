@@ -16,10 +16,10 @@ export default async function ProfilePage() {
     let records: Record[] = [];
     try {
         const recordService = new RecordService(serverAuthProvider);
-        records = await recordService.getRecordsByOwnedBy(user);
+        records = await recordService.getRecordsByOwnedBy(user!);
     } catch (error) {
         console.log(error);
     }
 
-    return <ProfileClient user={user} records={records} />;
+    return <ProfileClient user={user!} records={records} />;
 }

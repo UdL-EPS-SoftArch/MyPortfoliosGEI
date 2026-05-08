@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -32,7 +31,6 @@ interface ProfileClientProps {
 }
 
 export default function ProfileClient({ user, records }: ProfileClientProps) {
-    const router = useRouter();
     const { setUser } = useAuth();
     const service = new UsersService(clientAuthProvider());
 
