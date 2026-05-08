@@ -37,6 +37,8 @@ type DraftMap = {
 type Tab = "reports" | "portfolios" | "projects" | "assets";
 
 const visibilityOptions = ["PUBLIC", "PRIVATE", "RESTRICTED"];
+const fieldClassName = "border-white/20 bg-black/20 text-white placeholder:text-gray-400 focus-visible:ring-white/30";
+const textareaClassName = `${fieldClassName} min-h-20`;
 
 function isDemoItem(uri: string) {
     return uri.startsWith("demo:");
@@ -238,17 +240,17 @@ export default function AdminPanel({
     }
 
     return (
-        <div className="min-h-screen bg-zinc-50 pt-28 text-zinc-950">
+        <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-blue-950 pt-28 text-white">
             <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 pb-16 sm:px-10">
-                <header className="flex flex-col gap-5 border-b border-zinc-200 pb-8 lg:flex-row lg:items-end lg:justify-between">
+                <header className="flex flex-col gap-5 border-b border-white/15 pb-8 lg:flex-row lg:items-end lg:justify-between">
                     <div className="space-y-3">
-                        <div className="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-1 text-sm text-zinc-600">
+                        <div className="inline-flex items-center gap-2 rounded-md border border-white/20 bg-white/10 px-3 py-1 text-sm text-gray-300 backdrop-blur-md">
                             <ShieldCheck className="h-4 w-4 text-emerald-600" />
                             {currentUser.username}
                         </div>
                         <div>
-                            <h1 className="text-3xl font-semibold tracking-tight">Admin panel</h1>
-                            <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-600">
+                            <h1 className="text-4xl font-bold tracking-tight text-white">Admin panel</h1>
+                            <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-300">
                                 Manage reported projects, portfolios, project visibility, and uploaded assets.
                             </p>
                         </div>
@@ -263,8 +265,8 @@ export default function AdminPanel({
                 </header>
 
                 {loadErrors.length > 0 && (
-                    <div className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                        <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                    <div className="flex items-start gap-3 rounded-md border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-sm text-amber-100 backdrop-blur-md">
+                        <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-300" />
                         <span>{loadErrors.join(" ")}</span>
                     </div>
                 )}
@@ -275,26 +277,26 @@ export default function AdminPanel({
                     <TabButton active={activeTab === "projects"} onClick={() => setActiveTab("projects")} icon={<FolderKanban className="h-4 w-4" />} label="Projects" />
                     <TabButton active={activeTab === "assets"} onClick={() => setActiveTab("assets")} icon={<ImageIcon className="h-4 w-4" />} label="Assets" />
                     {status && (
-                        <span className="ml-auto rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-600">
+                        <span className="ml-auto rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-gray-200 backdrop-blur-md">
                             {status}
                         </span>
                     )}
                 </div>
 
                 {activeTab === "reports" && (
-                    <section className="overflow-hidden rounded-md border border-zinc-200 bg-white">
+                    <section className="overflow-hidden rounded-md border border-white/15 bg-white/10 shadow-2xl backdrop-blur-md">
                         <TableHeader columns="md:grid-cols-[1fr_1.2fr_160px_150px]" labels={["Project", "Description", "Visibility", "Actions"]} />
                         {reports.length === 0 ? (
                             <EmptyState label="No flagged projects" />
                         ) : reports.map((project) => {
                             const draft = projectDrafts[project.uri];
                             return (
-                                <div key={project.uri} className="grid gap-4 border-b border-zinc-100 px-5 py-4 last:border-b-0 md:grid-cols-[1fr_1.2fr_160px_150px] md:items-start">
-                                    <Input value={draft.name} onChange={(event) => updateDraft(setProjectDrafts, project.uri, { name: event.target.value })} />
-                                    <Textarea value={draft.description} onChange={(event) => updateDraft(setProjectDrafts, project.uri, { description: event.target.value })} />
+                                <div key={project.uri} className="grid gap-4 border-b border-white/10 px-5 py-4 last:border-b-0 md:grid-cols-[1fr_1.2fr_160px_150px] md:items-start">
+                                    <Input value={draft.name} onChange={(event) => updateDraft(setProjectDrafts, project.uri, { name: event.target.value })} className={fieldClassName} />
+                                    <Textarea value={draft.description} onChange={(event) => updateDraft(setProjectDrafts, project.uri, { description: event.target.value })} className={textareaClassName} />
                                     <VisibilitySelect value={draft.visibility ?? "PRIVATE"} onChange={(visibility) => updateDraft(setProjectDrafts, project.uri, { visibility })} />
                                     <div className="flex gap-2">
-                                        <Button type="button" variant="outline" disabled={busyItem === project.uri} onClick={() => resolveReport(project)}>
+                                        <Button type="button" variant="outline" disabled={busyItem === project.uri} onClick={() => resolveReport(project)} className="border-white/20 bg-white text-black hover:bg-gray-200">
                                             Resolve
                                         </Button>
                                         <IconButton busy={busyItem === project.uri} onClick={() => saveProject(project)} label="Save" icon={<Save className="h-4 w-4" />} />
@@ -380,26 +382,26 @@ function EditableCollection<TItem extends AssetEntity | PortfolioEntity | Projec
     hasVisibility?: boolean;
 }) {
     return (
-        <section className="overflow-hidden rounded-md border border-zinc-200 bg-white">
+        <section className="overflow-hidden rounded-md border border-white/15 bg-white/10 shadow-2xl backdrop-blur-md">
             <TableHeader columns={columns} labels={labels} />
             {items.length === 0 ? (
                 <EmptyState label={emptyLabel} />
             ) : items.map((item) => {
                 const draft = drafts[item.uri];
                 return (
-                    <div key={item.uri} className={`grid gap-4 border-b border-zinc-100 px-5 py-4 last:border-b-0 ${columns} md:items-start`}>
-                        <Input value={draft.name} onChange={(event) => onDraftChange(item.uri, { name: event.target.value })} />
-                        <Textarea value={draft.description} onChange={(event) => onDraftChange(item.uri, { description: event.target.value })} />
+                    <div key={item.uri} className={`grid gap-4 border-b border-white/10 px-5 py-4 last:border-b-0 ${columns} md:items-start`}>
+                        <Input value={draft.name} onChange={(event) => onDraftChange(item.uri, { name: event.target.value })} className={fieldClassName} />
+                        <Textarea value={draft.description} onChange={(event) => onDraftChange(item.uri, { description: event.target.value })} className={textareaClassName} />
                         {hasVisibility && (
                             <VisibilitySelect value={draft.visibility ?? "PRIVATE"} onChange={(visibility) => onDraftChange(item.uri, { visibility })} />
                         )}
                         {hasFlagged && (
-                            <label className="flex h-9 items-center gap-2 text-sm text-zinc-700">
+                            <label className="flex h-9 items-center gap-2 text-sm text-gray-200">
                                 <input
                                     type="checkbox"
                                     checked={draft.flagged ?? false}
                                     onChange={(event) => onDraftChange(item.uri, { flagged: event.target.checked })}
-                                    className="h-4 w-4 rounded border-zinc-300"
+                                    className="h-4 w-4 rounded border-white/30 bg-black/20 accent-blue-500"
                                 />
                                 Reported
                             </label>
@@ -418,7 +420,7 @@ function EditableCollection<TItem extends AssetEntity | PortfolioEntity | Projec
 
 function TableHeader({ columns, labels }: { columns: string; labels: string[] }) {
     return (
-        <div className={`hidden gap-4 border-b border-zinc-200 bg-zinc-100 px-5 py-3 text-sm font-medium text-zinc-600 md:grid ${columns}`}>
+        <div className={`hidden gap-4 border-b border-white/15 bg-white/10 px-5 py-3 text-sm font-medium text-gray-300 md:grid ${columns}`}>
             {labels.map((label) => <span key={label}>{label}</span>)}
         </div>
     );
@@ -429,11 +431,11 @@ function VisibilitySelect({ value, onChange }: { value: string; onChange: (value
 
     return (
         <label className="flex items-center gap-2">
-            {isPublic ? <Eye className="h-4 w-4 text-emerald-600" /> : <EyeOff className="h-4 w-4 text-zinc-500" />}
+            {isPublic ? <Eye className="h-4 w-4 text-emerald-400" /> : <EyeOff className="h-4 w-4 text-gray-400" />}
             <select
                 value={value}
                 onChange={(event) => onChange(event.target.value)}
-                className="h-9 w-full rounded-md border border-zinc-200 bg-white px-3 text-sm shadow-xs outline-none transition focus:border-zinc-400 focus:ring-2 focus:ring-zinc-200"
+                className="h-9 w-full rounded-md border border-white/20 bg-black/20 px-3 text-sm text-white shadow-xs outline-none transition focus:border-white/40 focus:ring-2 focus:ring-white/20"
             >
                 {visibilityOptions.map((option) => (
                     <option key={option} value={option}>{option}</option>
@@ -447,7 +449,7 @@ function RowActions({ busy, onSave, onDelete }: { busy: boolean; onSave: () => v
     return (
         <div className="flex gap-2">
             <IconButton busy={busy} onClick={onSave} label="Save" icon={<Save className="h-4 w-4" />} />
-            <IconButton busy={busy} onClick={onDelete} label="Delete" icon={<Trash2 className="h-4 w-4" />} className="text-red-600 hover:text-red-700" />
+            <IconButton busy={busy} onClick={onDelete} label="Delete" icon={<Trash2 className="h-4 w-4" />} className="text-red-300 hover:text-red-200" />
         </div>
     );
 }
@@ -466,7 +468,7 @@ function IconButton({
     className?: string;
 }) {
     return (
-        <Button type="button" size="icon" variant="outline" disabled={busy} onClick={onClick} title={label} className={className}>
+        <Button type="button" size="icon" variant="outline" disabled={busy} onClick={onClick} title={label} className={`border-white/20 bg-white/10 hover:bg-white/20 ${className ?? "text-white"}`}>
             {icon}
         </Button>
     );
@@ -477,7 +479,7 @@ function TabButton({ active, onClick, icon, label }: { active: boolean; onClick:
         <button
             type="button"
             onClick={onClick}
-            className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition ${active ? "bg-zinc-950 text-white" : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-100"}`}
+            className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition ${active ? "bg-white text-black shadow-lg" : "border border-white/20 bg-white/10 text-gray-200 hover:bg-white/20"}`}
         >
             {icon}
             {label}
@@ -487,16 +489,16 @@ function TabButton({ active, onClick, icon, label }: { active: boolean; onClick:
 
 function Stat({ label, value }: { label: string; value: number }) {
     return (
-        <div className="rounded-md border border-zinc-200 bg-white px-4 py-3">
-            <div className="font-semibold">{value}</div>
-            <div className="text-zinc-500">{label}</div>
+        <div className="rounded-md border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md">
+            <div className="text-lg font-semibold text-white">{value}</div>
+            <div className="text-gray-300">{label}</div>
         </div>
     );
 }
 
 function EmptyState({ label }: { label: string }) {
     return (
-        <div className="px-5 py-10 text-center text-sm text-zinc-500">
+        <div className="px-5 py-10 text-center text-sm text-gray-300">
             {label}
         </div>
     );
