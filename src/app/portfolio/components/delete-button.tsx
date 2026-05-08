@@ -11,18 +11,19 @@ import { Trash2 } from "lucide-react";
 type Props = {
     portfolioId: string;
     creatorUsername?: string;
+    forceVisible?: boolean;
 };
 
-export default function DeletePortfolioButton({ portfolioId, creatorUsername }: Props) {
+export default function DeletePortfolioButton({ portfolioId, creatorUsername, forceVisible = false }: Props) {
     const { user } = useAuth();
     const router = useRouter();
     const [isDeleting, setIsDeleting] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    if (!user || (creatorUsername && user.username !== creatorUsername)) return null;
+    if (!forceVisible && (!user || (creatorUsername && user.username !== creatorUsername))) return null;
 
     const onClick = () => {
-        if (!window.confirm("Delete this portfolio? This action cannot be undone.")) return;
+        if (!window.confirm("Eliminar este portfolio? Esta accion no se puede deshacer.")) return;
 
         setIsDeleting(true);
         setErrorMessage(null);
@@ -32,7 +33,7 @@ export default function DeletePortfolioButton({ portfolioId, creatorUsername }: 
             router.push("/portfolio");
             router.refresh();
         }).catch((error: Error) => {
-            setErrorMessage(error.message || "Failed to delete portfolio");
+            setErrorMessage(error.message || "No se ha podido eliminar el portfolio");
             setIsDeleting(false);
         });
     };
@@ -47,7 +48,7 @@ export default function DeletePortfolioButton({ portfolioId, creatorUsername }: 
                 disabled={isDeleting}
             >
                 <Trash2 className="h-4 w-4" />
-                {isDeleting ? "Deleting..." : "Delete"}
+                {isDeleting ? "Eliminando..." : "Eliminar"}
             </Button>
             {errorMessage && (
                 <p className="text-xs text-red-600">{errorMessage}</p>

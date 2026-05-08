@@ -15,6 +15,9 @@ export default function Navbar() {
     ];
 
     const isAuthPage = pathname === "/login" || pathname === "/users/register";
+    const isPortfolioWorkspace = pathname.startsWith("/portfolio");
+
+    if (isPortfolioWorkspace) return null;
 
     return (
         <nav className="absolute top-0 w-full z-50 bg-transparent text-white">

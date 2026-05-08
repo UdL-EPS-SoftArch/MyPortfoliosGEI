@@ -8,18 +8,19 @@ import { Pencil } from "lucide-react";
 type Props = {
     portfolioId: string;
     creatorUsername?: string;
+    forceVisible?: boolean;
 };
 
-export default function EditPortfolioButton({ portfolioId, creatorUsername }: Props) {
+export default function EditPortfolioButton({ portfolioId, creatorUsername, forceVisible = false }: Props) {
     const { user } = useAuth();
 
-    if (!user || (creatorUsername && user.username !== creatorUsername)) return null;
+    if (!forceVisible && (!user || (creatorUsername && user.username !== creatorUsername))) return null;
 
     return (
         <Link href={`/portfolio/${portfolioId}/edit`}>
-            <Button size="sm" variant="outline" className="gap-1">
+            <Button size="sm" variant="outline" className="gap-1 border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white">
                 <Pencil className="h-4 w-4" />
-                Edit
+                Editar
             </Button>
         </Link>
     );

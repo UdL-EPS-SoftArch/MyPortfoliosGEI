@@ -1,14 +1,23 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { PortfolioService } from "@/api/portfolioApi";
+import { UsersService } from "@/api/userApi";
 import { serverAuthProvider } from "@/lib/authProvider";
 import { User } from "@/types/user";
 import EditPortfolioButton from "@/app/portfolio/components/edit-button";
-import DeletePortfolioButton from "@/app/portfolio/components/delete-button";
+import PortfolioWorkspace from "@/app/portfolio/components/portfolio-workspace";
 
 export default async function PortfolioDetailPage(props: { params: Promise<{ id: string }> }) {
     const service = new PortfolioService(serverAuthProvider);
+    const userService = new UsersService(serverAuthProvider);
     const { id } = await props.params;
-    const portfolio = await service.getPortfolioById(id);
+    const [portfolio, currentUser] = await Promise.all([
+        service.getPortfolioById(id),
+        userService.getCurrentUser().catch(() => null),
+    ]);
+    const ownPortfolios = currentUser?.uri
+        ? await service.getPortfoliosByCreator(currentUser).catch(() => [])
+        : [];
 
     let creator: User | null = null;
     try {
@@ -18,39 +27,57 @@ export default async function PortfolioDetailPage(props: { params: Promise<{ id:
     }
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-            <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-                <div className="flex flex-col items-center w-full gap-6 text-center sm:items-start sm:text-left">
-                    <div className="space-y-4 w-full">
-                        <div className="flex items-center justify-between gap-4">
-                            <h1 className="text-2xl font-semibold">{portfolio.name}</h1>
-                            <div className="flex items-center gap-2">
-                                <EditPortfolioButton portfolioId={id} creatorUsername={creator?.username} />
-                                <DeletePortfolioButton portfolioId={id} creatorUsername={creator?.username} />
-                            </div>
-                        </div>
-
-                        {portfolio.description && (
-                            <p className="text-gray-700">{portfolio.description}</p>
-                        )}
-
-                        {portfolio.visibility && (
-                            <p className="text-gray-700">
-                                <strong>Visibility:</strong> {portfolio.visibility}
-                            </p>
-                        )}
-
-                        {creator && (
-                            <p className="text-gray-700">
-                                <strong>Creator:</strong>{" "}
-                                <Link href={`/users/${creator.username}`} className="hover:underline">
+        <PortfolioWorkspace
+            ownPortfolios={ownPortfolios}
+            activePortfolioId={id}
+            canManagePortfolios={Boolean(currentUser)}
+        >
+            <article className="mx-auto w-full max-w-4xl rounded-md border border-white/15 bg-white/10 p-6 text-white shadow-2xl backdrop-blur-md sm:p-8 lg:p-10">
+                <div className="mb-8 flex flex-col gap-5 border-b border-white/15 pb-6 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gray-400">
+                            Portfolio
+                        </p>
+                        <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-5xl">
+                            {portfolio.name}
+                        </h1>
+                        <div className="mt-4 flex flex-wrap gap-3 text-sm text-gray-300">
+                            {portfolio.visibility && <span>{portfolio.visibility}</span>}
+                            {creator && (
+                                <Link href={`/users/${creator.username}`} className="hover:text-white hover:underline">
                                     {creator.username}
                                 </Link>
-                            </p>
-                        )}
+                            )}
+                        </div>
                     </div>
+
+                    <EditPortfolioButton
+                        portfolioId={id}
+                        creatorUsername={creator?.username}
+                        forceVisible={Boolean(currentUser && creator && currentUser.username === creator.username)}
+                    />
                 </div>
-            </main>
-        </div>
+
+                {portfolio.image && (
+                    <img
+                        src={portfolio.image}
+                        alt={portfolio.name}
+                        className="mb-8 aspect-[16/9] w-full rounded-md object-cover"
+                    />
+                )}
+
+                <div className="prose prose-invert max-w-none">
+                    {portfolio.description ? (
+                        <p className="whitespace-pre-line text-lg leading-8 text-gray-200">
+                            {portfolio.description}
+                        </p>
+                    ) : (
+                        <p className="text-gray-300">
+                            Este portfolio todavia no tiene contenido de texto.
+                        </p>
+                    )}
+                </div>
+            </article>
+        </PortfolioWorkspace>
     );
 }
