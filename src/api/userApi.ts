@@ -1,4 +1,4 @@
-import { getHal, mergeHal, mergeHalArray, postHal } from "./halClient";
+import { getHal, mergeHal, mergeHalArray, postHal, patchHal, putHal } from "./halClient";
 import type { AuthProvider } from "@/lib/authProvider";
 import { User } from "@/types/user";
 
@@ -27,6 +27,16 @@ export class UsersService {
 
     async createUser(user: User): Promise<User> {
         const resource = await postHal('/users', user, this.authProvider);
+        return mergeHal<User>(resource);
+    }
+
+    async updateUser(username: string, data: Partial<User>): Promise<User> {
+        const resource = await patchHal(`/users/${username}`, data, this.authProvider);
+        return mergeHal<User>(resource);
+    }
+
+    async changePassword(username: string, newPassword: string): Promise<User> {
+        const resource = await putHal(`/users/${username}`, { password: newPassword }, this.authProvider);
         return mergeHal<User>(resource);
     }
 }
