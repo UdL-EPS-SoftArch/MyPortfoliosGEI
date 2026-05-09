@@ -13,6 +13,7 @@ export interface UserEntity {
     twitter?: string;
     instagram?: string;
     password?: string;
+    role?: string;
     authorities?: AuthorityEntity[];
 }
 

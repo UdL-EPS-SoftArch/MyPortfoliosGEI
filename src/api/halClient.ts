@@ -80,3 +80,18 @@ export async function putHal(path: string, body: object, authProvider: { getAuth
     }
     return halfred.parse(await res.json());
 }
+
+export async function deleteHal(path: string, authProvider: { getAuth: () => Promise<string | null> }) {
+    const url = path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
+    const authorization = await authProvider.getAuth();
+    const res = await fetch(url, {
+        method: "DELETE",
+        headers: {
+            ...(authorization ? { Authorization: authorization } : {}),
+        },
+        cache: "no-store",
+    });
+    if (!res.ok) {
+        throw new Error(`HTTP ${res.status} deleting ${url}`);
+    }
+}
