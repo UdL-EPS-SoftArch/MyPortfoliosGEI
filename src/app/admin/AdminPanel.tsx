@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { clientAuthProvider } from "@/lib/authProvider";
 import type { Asset, AssetEntity } from "@/types/asset";
-import type { Portfolio, PortfolioEntity } from "@/types/portfolio";
+import type { Portfolio, PortfolioEntity, Visibility } from "@/types/portfolio";
 import type { Project, ProjectEntity } from "@/types/project";
 import type { UserEntity } from "@/types/user";
 
@@ -26,7 +26,7 @@ type AdminPanelProps = {
 type Draft = {
     name: string;
     description: string;
-    visibility?: string;
+    visibility?: Visibility;
     flagged?: boolean;
 };
 
@@ -48,7 +48,7 @@ function buildDrafts(items: Array<AssetEntity | PortfolioEntity | ProjectEntity>
     return Object.fromEntries(items.map((item) => [item.uri, {
         name: item.name ?? "",
         description: item.description ?? "",
-        visibility: "visibility" in item ? item.visibility ?? "PRIVATE" : undefined,
+        visibility: item.visibility ?? "PRIVATE",
         flagged: "flagged" in item ? item.flagged ?? false : undefined,
     }]));
 }
@@ -122,14 +122,15 @@ export default function AdminPanel({
                 setPortfolios((items) => items.map((item) => item.uri === portfolio.uri ? { ...item, ...draft } : item));
                 return;
             }
-
-            const service = new PortfolioService(clientAuthProvider());
-            const updated = await service.updatePortfolio(portfolio, {
-                name: draft.name,
-                description: draft.description,
-                visibility: draft.visibility,
-            });
-            setPortfolios((items) => items.map((item) => item.uri === portfolio.uri ? toPortfolioEntity(updated) : item));
+            if (portfolio.id) {
+                const service = new PortfolioService(clientAuthProvider());
+                const updated = await service.updatePortfolio(portfolio.id, {
+                    name: draft.name,
+                    description: draft.description,
+                    visibility: draft.visibility,
+                });
+                setPortfolios((items) => items.map((item) => item.uri === portfolio.uri ? toPortfolioEntity(updated) : item));
+            }
         });
     }
 
@@ -140,10 +141,11 @@ export default function AdminPanel({
                 setPortfolios((items) => items.filter((item) => item.uri !== portfolio.uri));
                 return;
             }
-
-            const service = new PortfolioService(clientAuthProvider());
-            await service.deletePortfolio(portfolio);
-            setPortfolios((items) => items.filter((item) => item.uri !== portfolio.uri));
+            if (portfolio.id) {
+                const service = new PortfolioService(clientAuthProvider());
+                await service.deletePortfolio(portfolio.id);
+                setPortfolios((items) => items.filter((item) => item.uri !== portfolio.uri));
+            }
         });
     }
 
@@ -426,7 +428,7 @@ function TableHeader({ columns, labels }: { columns: string; labels: string[] })
     );
 }
 
-function VisibilitySelect({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+function VisibilitySelect({ value, onChange }: { value: Visibility; onChange: (value: Visibility) => void }) {
     const isPublic = value === "PUBLIC";
 
     return (
@@ -434,7 +436,7 @@ function VisibilitySelect({ value, onChange }: { value: string; onChange: (value
             {isPublic ? <Eye className="h-4 w-4 text-emerald-400" /> : <EyeOff className="h-4 w-4 text-gray-400" />}
             <select
                 value={value}
-                onChange={(event) => onChange(event.target.value)}
+                onChange={(event) => onChange(event.target.value as Visibility)}
                 className="h-9 w-full rounded-md border border-white/20 bg-black/20 px-3 text-sm text-white shadow-xs outline-none transition focus:border-white/40 focus:ring-2 focus:ring-white/20"
             >
                 {visibilityOptions.map((option) => (

@@ -1,6 +1,6 @@
 import { Resource } from "halfred";
 
-export type Visibility = "PUBLIC" | "PRIVATE" | "UNLISTED";
+export type Visibility = "PUBLIC" | "PRIVATE" | "UNLISTED" | "RESTRICTED";
 
 export interface PortfolioEntity {
     uri: string;
