@@ -10,6 +10,7 @@ export interface UserEntity {
     email?: string;
     password?: string;
     role?: string;
+    roles?: string | Array<string | AuthorityEntity>;
     authorities?: AuthorityEntity[];
 }
 

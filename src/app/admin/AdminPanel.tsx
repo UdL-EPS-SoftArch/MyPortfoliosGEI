@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { Dispatch, ReactNode, SetStateAction } from "react";
-import { AlertCircle, Eye, EyeOff, FileText, FolderKanban, ImageIcon, Save, ShieldCheck, Trash2 } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, FileText, FolderKanban, ImageIcon, Save, Search, ShieldCheck, Trash2, UserCog } from "lucide-react";
 import { AssetService } from "@/api/assetApi";
 import { PortfolioService } from "@/api/portfolioApi";
 import { ProjectService } from "@/api/projectApi";
@@ -20,6 +20,7 @@ type AdminPanelProps = {
     initialAssets: AssetEntity[];
     initialPortfolios: PortfolioEntity[];
     initialProjects: ProjectEntity[];
+    initialUsers: UserEntity[];
     loadErrors: string[];
 };
 
@@ -34,9 +35,18 @@ type DraftMap = {
     [uri: string]: Draft;
 };
 
-type Tab = "reports" | "portfolios" | "projects" | "assets";
+type UserDraftMap = {
+    [username: string]: string;
+};
+
+type Tab = "reports" | "portfolios" | "projects" | "assets" | "users";
 
 const visibilityOptions = ["PUBLIC", "PRIVATE", "RESTRICTED"];
+const roleOptions = [
+    { label: "User", value: "ROLE_USER" },
+    { label: "Editor", value: "ROLE_USER,ROLE_EDITOR" },
+    { label: "Admin", value: "ROLE_USER,ROLE_ADMIN" },
+];
 const fieldClassName = "border-white/20 bg-black/20 text-white placeholder:text-gray-400 focus-visible:ring-white/30";
 const textareaClassName = `${fieldClassName} min-h-20`;
 
@@ -51,6 +61,32 @@ function buildDrafts(items: Array<AssetEntity | PortfolioEntity | ProjectEntity>
         visibility: item.visibility ?? "PRIVATE",
         flagged: "flagged" in item ? item.flagged ?? false : undefined,
     }]));
+}
+
+function roleValue(user: UserEntity) {
+    if (typeof user.roles === "string" && user.roles.trim()) return user.roles;
+    const roles = Array.isArray(user.roles)
+        ? user.roles.map((role) => typeof role === "string" ? role : role.authority)
+        : undefined;
+    if (roles?.length) return roles.join(",");
+    const authorities = user.authorities?.map((authority) => authority.authority);
+    if (authorities?.length) return authorities.join(",");
+    return user.role ?? "ROLE_USER";
+}
+
+function buildUserDrafts(users: UserEntity[]) {
+    return Object.fromEntries(users.map((user) => [user.username, roleValue(user)]));
+}
+
+function hasRole(userOrRoles: UserEntity | string, role: "ROLE_ADMIN" | "ROLE_EDITOR") {
+    const roles = typeof userOrRoles === "string" ? userOrRoles : roleValue(userOrRoles);
+    return roles.split(",").map((value) => value.trim()).includes(role);
+}
+
+function roleLabel(roles: string) {
+    if (hasRole(roles, "ROLE_ADMIN")) return "Admin";
+    if (hasRole(roles, "ROLE_EDITOR")) return "Editor";
+    return "User";
 }
 
 function toAssetEntity(asset: Asset): AssetEntity {
@@ -88,15 +124,20 @@ export default function AdminPanel({
     initialAssets,
     initialPortfolios,
     initialProjects,
+    initialUsers,
     loadErrors,
 }: AdminPanelProps) {
     const [activeTab, setActiveTab] = useState<Tab>("reports");
     const [assets, setAssets] = useState(initialAssets);
     const [portfolios, setPortfolios] = useState(initialPortfolios);
     const [projects, setProjects] = useState(initialProjects);
+    const [users, setUsers] = useState(initialUsers);
     const [assetDrafts, setAssetDrafts] = useState<DraftMap>(() => buildDrafts(initialAssets));
     const [portfolioDrafts, setPortfolioDrafts] = useState<DraftMap>(() => buildDrafts(initialPortfolios));
     const [projectDrafts, setProjectDrafts] = useState<DraftMap>(() => buildDrafts(initialProjects));
+    const [userDrafts, setUserDrafts] = useState<UserDraftMap>(() => buildUserDrafts(initialUsers));
+    const [userSearch, setUserSearch] = useState("");
+    const [roleFilter, setRoleFilter] = useState("ALL");
     const [status, setStatus] = useState<string | null>(null);
     const [busyItem, setBusyItem] = useState<string | null>(null);
 
@@ -106,7 +147,27 @@ export default function AdminPanel({
         publicItems: [...portfolios, ...projects].filter((item) => item.visibility === "PUBLIC").length,
         privateItems: [...portfolios, ...projects].filter((item) => item.visibility === "PRIVATE").length,
         assets: assets.length,
-    }), [assets.length, portfolios, projects, reports.length]);
+        users: users.length,
+    }), [assets.length, portfolios, projects, reports.length, users.length]);
+    const roleStats = useMemo(() => ({
+        admins: users.filter((user) => hasRole(user, "ROLE_ADMIN")).length,
+        editors: users.filter((user) => hasRole(user, "ROLE_EDITOR")).length,
+        users: users.filter((user) => !hasRole(user, "ROLE_ADMIN") && !hasRole(user, "ROLE_EDITOR")).length,
+    }), [users]);
+    const filteredUsers = useMemo(() => {
+        const query = userSearch.trim().toLowerCase();
+        return users.filter((user) => {
+            const roles = userDrafts[user.username] ?? roleValue(user);
+            const matchesQuery = !query
+                || user.username.toLowerCase().includes(query)
+                || user.email?.toLowerCase().includes(query)
+                || roleLabel(roles).toLowerCase().includes(query)
+                || roles.toLowerCase().includes(query);
+            const matchesRole = roleFilter === "ALL" || roleLabel(roles).toUpperCase() === roleFilter;
+
+            return matchesQuery && matchesRole;
+        });
+    }, [roleFilter, userDrafts, userSearch, users]);
 
     function updateDraft(setDrafts: Dispatch<SetStateAction<DraftMap>>, uri: string, updates: Partial<Draft>) {
         setDrafts((drafts) => ({
@@ -227,6 +288,42 @@ export default function AdminPanel({
         });
     }
 
+    function updateUserDraft(username: string, roles: string) {
+        setUserDrafts((drafts) => ({
+            ...drafts,
+            [username]: roles,
+        }));
+    }
+
+    async function saveUserRoles(user: UserEntity) {
+        const roles = userDrafts[user.username] ?? "ROLE_USER";
+        const previousRoles = roleValue(user);
+        if (!hasRole(previousRoles, "ROLE_ADMIN") && hasRole(roles, "ROLE_ADMIN")) {
+            const confirmed = window.confirm(`Promote ${user.username} to Admin? This grants full admin-panel access.`);
+            if (!confirmed) return;
+        }
+
+        // Backend role persistence is intentionally disabled here so the frontend branch
+        // does not require API changes. Demo users still update locally to show the flow.
+        if (!isDemoItem(user.uri ?? "")) {
+            setStatus("Role management is a frontend preview until the API supports writable roles.");
+            return;
+        }
+
+        await runAction(
+            user.username,
+            `${currentUser.username} changed ${user.username} from ${roleLabel(previousRoles)} to ${roleLabel(roles)} at ${new Date().toLocaleString()}.`,
+            "Could not update user roles",
+            async () => {
+                setUsers((items) => items.map((item) => item.username === user.username ? {
+                    ...item,
+                    roles,
+                    authorities: roles.split(",").map((authority) => ({ authority })),
+                } : item));
+            }
+        );
+    }
+
     async function runAction(uri: string, success: string, failure: string, action: () => Promise<void>) {
         setBusyItem(uri);
         setStatus(null);
@@ -258,11 +355,12 @@ export default function AdminPanel({
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+                    <div className="grid grid-cols-2 gap-3 text-sm sm:grid-cols-5">
                         <Stat label="Reports" value={stats.flagged} />
                         <Stat label="Public" value={stats.publicItems} />
                         <Stat label="Private" value={stats.privateItems} />
                         <Stat label="Assets" value={stats.assets} />
+                        <Stat label="Users" value={stats.users} />
                     </div>
                 </header>
 
@@ -278,6 +376,7 @@ export default function AdminPanel({
                     <TabButton active={activeTab === "portfolios"} onClick={() => setActiveTab("portfolios")} icon={<FolderKanban className="h-4 w-4" />} label="Portfolios" />
                     <TabButton active={activeTab === "projects"} onClick={() => setActiveTab("projects")} icon={<FolderKanban className="h-4 w-4" />} label="Projects" />
                     <TabButton active={activeTab === "assets"} onClick={() => setActiveTab("assets")} icon={<ImageIcon className="h-4 w-4" />} label="Assets" />
+                    <TabButton active={activeTab === "users"} onClick={() => setActiveTab("users")} icon={<UserCog className="h-4 w-4" />} label="Users" />
                     {status && (
                         <span className="ml-auto rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-gray-200 backdrop-blur-md">
                             {status}
@@ -352,6 +451,62 @@ export default function AdminPanel({
                         busyItem={busyItem}
                         emptyLabel="No assets found"
                     />
+                )}
+
+                {activeTab === "users" && (
+                    <div className="space-y-4">
+                        <div className="grid gap-3 text-sm sm:grid-cols-3">
+                            <Stat label="Admins" value={roleStats.admins} />
+                            <Stat label="Editors" value={roleStats.editors} />
+                            <Stat label="Users" value={roleStats.users} />
+                        </div>
+                        <div className="flex flex-col gap-3 rounded-md border border-white/15 bg-white/10 p-4 backdrop-blur-md md:flex-row">
+                            <label className="flex min-w-0 flex-1 items-center gap-2 rounded-md border border-white/20 bg-black/20 px-3">
+                                <Search className="h-4 w-4 shrink-0 text-gray-400" />
+                                <input
+                                    value={userSearch}
+                                    onChange={(event) => setUserSearch(event.target.value)}
+                                    placeholder="Search users"
+                                    className="h-9 min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-gray-400"
+                                />
+                            </label>
+                            <select value={roleFilter} onChange={(event) => setRoleFilter(event.target.value)} className="h-9 rounded-md border border-white/20 bg-black/20 px-3 text-sm text-white outline-none">
+                                <option value="ALL">All roles</option>
+                                <option value="ADMIN">Admins</option>
+                                <option value="EDITOR">Editors</option>
+                                <option value="USER">Users</option>
+                            </select>
+                        </div>
+                        <section className="overflow-hidden rounded-md border border-white/15 bg-white/10 shadow-2xl backdrop-blur-md">
+                            <TableHeader columns="md:grid-cols-[1fr_1.3fr_180px_90px]" labels={["User", "Email", "Role", "Actions"]} />
+                            {filteredUsers.length === 0 ? (
+                                <EmptyState label="No users found" />
+                            ) : filteredUsers.map((user) => (
+                                <div key={user.username} className="grid gap-4 border-b border-white/10 px-5 py-4 last:border-b-0 md:grid-cols-[1fr_1.3fr_180px_90px] md:items-center">
+                                    <div>
+                                        <div className="font-medium text-white">{user.username}</div>
+                                        {user.username === currentUser.username && (
+                                            <div className="text-xs text-gray-400">Current session</div>
+                                        )}
+                                    </div>
+                                    <div className="text-sm text-gray-300">{user.email ?? "No email"}</div>
+                                    <RoleSelect
+                                        value={userDrafts[user.username] ?? "ROLE_USER"}
+                                        onChange={(roles) => updateUserDraft(user.username, roles)}
+                                        disabled={user.username === currentUser.username}
+                                    />
+                                    <div className="flex gap-2">
+                                        <IconButton
+                                            busy={busyItem === user.username}
+                                            onClick={() => saveUserRoles(user)}
+                                            label="Save role"
+                                            icon={<Save className="h-4 w-4" />}
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </section>
+                    </div>
                 )}
             </main>
         </div>
@@ -447,6 +602,21 @@ function VisibilitySelect({ value, onChange }: { value: Visibility; onChange: (v
     );
 }
 
+function RoleSelect({ value, onChange, disabled }: { value: string; onChange: (value: string) => void; disabled: boolean }) {
+    return (
+        <select
+            value={value}
+            disabled={disabled}
+            onChange={(event) => onChange(event.target.value)}
+            className="h-9 w-full rounded-md border border-white/20 bg-black/20 px-3 text-sm text-white shadow-xs outline-none transition disabled:cursor-not-allowed disabled:opacity-60 focus:border-white/40 focus:ring-2 focus:ring-white/20"
+        >
+            {roleOptions.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+        </select>
+    );
+}
+
 function RowActions({ busy, onSave, onDelete }: { busy: boolean; onSave: () => void; onDelete: () => void }) {
     return (
         <div className="flex gap-2">
@@ -462,15 +632,17 @@ function IconButton({
     label,
     icon,
     className,
+    disabled,
 }: {
     busy: boolean;
     onClick: () => void;
     label: string;
     icon: ReactNode;
     className?: string;
+    disabled?: boolean;
 }) {
     return (
-        <Button type="button" size="icon" variant="outline" disabled={busy} onClick={onClick} title={label} className={`border-white/20 bg-white/10 hover:bg-white/20 ${className ?? "text-white"}`}>
+        <Button type="button" size="icon" variant="outline" disabled={busy || disabled} onClick={onClick} title={label} className={`border-white/20 bg-white/10 hover:bg-white/20 ${className ?? "text-white"}`}>
             {icon}
         </Button>
     );

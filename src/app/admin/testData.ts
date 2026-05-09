@@ -1,6 +1,7 @@
 import type { AssetEntity } from "@/types/asset";
 import type { PortfolioEntity } from "@/types/portfolio";
 import type { ProjectEntity } from "@/types/project";
+import type { UserEntity } from "@/types/user";
 
 export const demoAssets: AssetEntity[] = [
     {
@@ -58,5 +59,37 @@ export const demoProjects: ProjectEntity[] = [
         description: "Reported by a user for duplicated assets.",
         flagged: true,
         visibility: "RESTRICTED",
+    },
+];
+
+export const demoUsers: UserEntity[] = [
+    {
+        uri: "demo:users/admin-sample",
+        username: "admin-sample",
+        email: "admin.sample@myportfolios.test",
+        roles: "ROLE_USER,ROLE_ADMIN",
+        authorities: [
+            { authority: "ROLE_USER" },
+            { authority: "ROLE_ADMIN" },
+        ],
+    },
+    {
+        uri: "demo:users/editor-sample",
+        username: "editor-sample",
+        email: "editor.sample@myportfolios.test",
+        roles: "ROLE_USER,ROLE_EDITOR",
+        authorities: [
+            { authority: "ROLE_USER" },
+            { authority: "ROLE_EDITOR" },
+        ],
+    },
+    {
+        uri: "demo:users/user-sample",
+        username: "user-sample",
+        email: "user.sample@myportfolios.test",
+        roles: "ROLE_USER",
+        authorities: [
+            { authority: "ROLE_USER" },
+        ],
     },
 ];
