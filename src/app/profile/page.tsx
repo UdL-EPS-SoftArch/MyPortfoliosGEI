@@ -13,13 +13,27 @@ export default async function ProfilePage() {
         redirect("/login");
     }
 
-    let records: Record[] = [];
+    const serializableUser = {
+        uri: user.uri,
+        username: user.username,
+        email: user.email,
+        authorities: user.authorities,
+    };
+
+    let records: Array<{ uri: string; name: string; description?: string; created?: string; modified?: string }> = [];
     try {
         const recordService = new RecordService(serverAuthProvider);
-        records = await recordService.getRecordsByOwnedBy(user!);
+        const fetchedRecords = await recordService.getRecordsByOwnedBy(user!);
+        records = fetchedRecords.map((record) => ({
+            uri: record.uri,
+            name: record.name,
+            description: record.description,
+            created: record.created?.toString(),
+            modified: record.modified?.toString(),
+        }));
     } catch (error) {
         console.log(error);
     }
 
-    return <ProfileClient user={user!} records={records} />;
+    return <ProfileClient user={serializableUser} records={records} />;
 }

@@ -13,8 +13,6 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { UsersService } from "@/api/userApi";
 import { clientAuthProvider } from "@/lib/authProvider";
 import { useAuth } from "@/app/components/authentication";
-import { User } from "@/types/user";
-import { Record } from "@/types/record";
 
 type ProfileFormValues = {
     email: string;
@@ -25,9 +23,24 @@ type PasswordFormValues = {
     confirmPassword: string;
 };
 
+interface ProfileUser {
+    uri?: string;
+    username: string;
+    email?: string;
+    authorities?: { authority: string }[];
+}
+
+interface ProfileRecord {
+    uri: string;
+    name: string;
+    description?: string;
+    created?: string;
+    modified?: string;
+}
+
 interface ProfileClientProps {
-    user: User;
-    records: Record[];
+    user: ProfileUser;
+    records: ProfileRecord[];
 }
 
 export default function ProfileClient({ user, records }: ProfileClientProps) {
