@@ -48,8 +48,8 @@ export default function Loginbar() {
                     <Avatar className="rounded-lg flex items-center justify-center bg-white/15 text-white">
                         <FontAwesomeIcon icon={faUser} className="h-4 w-4"/>
                     </Avatar>
-                    <Link href={`/users/${user.username}`}
-                          className="text-white text-md font-medium hover:text-gray-200 transition"> {user.username ?? "User"} </Link>
+                    <Link href="/profile"
+                          className="text-blue-600 text-md font-medium"> {user.username ?? "User"} </Link>
                 </div>
                 <button
                     onClick={logout}
