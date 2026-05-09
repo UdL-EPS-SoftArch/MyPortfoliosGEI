@@ -17,6 +17,10 @@ export default async function ProfilePage() {
         uri: user.uri,
         username: user.username,
         email: user.email,
+        name: user.name,
+        location: user.location,
+        twitter: user.twitter,
+        instagram: user.instagram,
         authorities: user.authorities,
     };
 
