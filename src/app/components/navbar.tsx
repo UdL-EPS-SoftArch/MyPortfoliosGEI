@@ -9,10 +9,15 @@ export default function Navbar() {
 
     const navLinks = [
         {href: "/why", label: "Why MyPortfolios"},
-        {href: "/explore", label: "Explore"}
+        {href: "/explore", label: "Explore"},
+        {href: "/portfolio", label: "Portfolio"},
+        {href: "/users", label: "Users", roles: ["ROLE_USER"]}
     ];
 
     const isAuthPage = pathname === "/login" || pathname === "/users/register";
+    const isPortfolioWorkspace = pathname.startsWith("/portfolio");
+
+    if (isPortfolioWorkspace) return null;
 
     return (
         <nav className="absolute top-0 w-full z-50 bg-transparent text-white">

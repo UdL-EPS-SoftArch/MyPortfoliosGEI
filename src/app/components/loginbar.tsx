@@ -45,7 +45,7 @@ export default function Loginbar() {
         return (
             <div className="flex items-center gap-5">
                 <div className="flex items-center gap-2">
-                    <Avatar className="rounded-lg flex items-center justify-center bg-gray-200">
+                    <Avatar className="rounded-lg flex items-center justify-center bg-white/15 text-white">
                         <FontAwesomeIcon icon={faUser} className="h-4 w-4"/>
                     </Avatar>
                     <Link href="/profile"
@@ -53,7 +53,7 @@ export default function Loginbar() {
                 </div>
                 <button
                     onClick={logout}
-                    className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                    className="inline-flex items-center px-3 py-1.5 bg-white text-black rounded-md text-sm font-medium hover:bg-gray-200 transition"
                 >
                     Logout
                 </button>
