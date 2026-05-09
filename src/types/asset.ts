@@ -8,6 +8,12 @@ export interface AssetEntity {
     name: string;
     description?: string;
     visibility?: Visibility;
+    contentType?: string;
+    url?: string;
+    createdBy?: string;
+    lastModifiedBy?: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 
 export type Asset = AssetEntity & Resource;

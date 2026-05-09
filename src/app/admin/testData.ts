@@ -1,4 +1,5 @@
 import type { AssetEntity } from "@/types/asset";
+import type { CreatorEntity } from "@/types/creator";
 import type { PortfolioEntity } from "@/types/portfolio";
 import type { ProjectEntity } from "@/types/project";
 import type { UserEntity } from "@/types/user";
@@ -9,12 +10,41 @@ export const demoAssets: AssetEntity[] = [
         id: "demo-asset-1",
         name: "Landing page cover",
         description: "Image uploaded to the public portfolio.",
+        contentType: "image/png",
+        url: "https://example.com/assets/landing-cover.png",
+        createdBy: "/creators/creator-sample",
     },
     {
         uri: "demo:assets/private-wireframes",
         id: "demo-asset-2",
         name: "Private wireframes",
         description: "Draft design files pending review.",
+        contentType: "application/pdf",
+        url: "https://example.com/assets/private-wireframes.pdf",
+        createdBy: "/creators/designer-sample",
+    },
+];
+
+export const demoCreators: CreatorEntity[] = [
+    {
+        uri: "demo:creators/creator-sample",
+        username: "creator-sample",
+        email: "creator.sample@myportfolios.test",
+        roles: "ROLE_USER,ROLE_CREATOR",
+        authorities: [
+            { authority: "ROLE_USER" },
+            { authority: "ROLE_CREATOR" },
+        ],
+    },
+    {
+        uri: "demo:creators/designer-sample",
+        username: "designer-sample",
+        email: "designer.sample@myportfolios.test",
+        roles: "ROLE_USER,ROLE_CREATOR",
+        authorities: [
+            { authority: "ROLE_USER" },
+            { authority: "ROLE_CREATOR" },
+        ],
     },
 ];
 
