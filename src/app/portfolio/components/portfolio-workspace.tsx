@@ -30,10 +30,10 @@ export default function PortfolioWorkspace({
             <header className="sticky top-0 z-40 border-b border-white/15 bg-black/35 backdrop-blur-md">
                 <div className="grid min-h-20 w-full grid-cols-1 items-center gap-4 px-5 py-4 md:grid-cols-[240px_1fr_240px] md:px-8 lg:px-12">
                     <Link
-                        href="/portfolio"
-                        className="text-xl font-extrabold tracking-tight text-white transition hover:text-gray-200"
+                        href="/"
+                        className="flex w-auto items-center gap-2 text-xl font-bold tracking-tight text-white transition hover:text-gray-200"
                     >
-                        My_Portfolio
+                        MyPortfolios
                     </Link>
 
                     <form action="/portfolio" className="relative w-full max-w-2xl justify-self-center">

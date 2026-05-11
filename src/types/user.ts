@@ -14,6 +14,7 @@ export interface UserEntity {
     instagram?: string;
     password?: string;
     role?: string;
+    roles?: string | Array<string | AuthorityEntity>;
     authorities?: AuthorityEntity[];
 }
 

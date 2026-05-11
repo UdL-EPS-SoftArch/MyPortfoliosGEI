@@ -6,6 +6,7 @@ import {RecordService} from "@/api/recordApi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
+import { isAdminUser } from "@/lib/permissions";
 
 function canManageProfile(currentUsername?: string, profileUsername?: string) {
     return currentUsername && profileUsername && currentUsername === profileUsername;
@@ -16,7 +17,7 @@ export default async function UsersPage(props: { params: Promise<{ id: string }>
     const recordService = new RecordService(serverAuthProvider)
     const user = await userService.getUserById((await props.params).id);
     const currentUser = await userService.getCurrentUser();
-    const canManage = canManageProfile(currentUser?.username, user.username);
+    const canOpenAdmin = canManageProfile(currentUser?.username, user.username) && isAdminUser(currentUser);
     let records: Record[] = [];
     try {
         records = await recordService.getRecordsByOwnedBy(user);
@@ -32,7 +33,7 @@ export default async function UsersPage(props: { params: Promise<{ id: string }>
                     <div className="space-y-4 w-full">
                         <div className="flex w-full flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                             <h1 className="text-2xl font-semibold">{user.username}</h1>
-                            {canManage && (
+                            {canOpenAdmin && (
                                 <Button asChild variant="outline">
                                     <Link href="/admin">
                                         <Settings className="h-4 w-4" />
