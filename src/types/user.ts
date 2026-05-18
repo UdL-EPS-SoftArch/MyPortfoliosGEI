@@ -8,7 +8,13 @@ export interface UserEntity {
     uri?: string;
     username: string;
     email?: string;
+    name?: string;
+    location?: string;
+    twitter?: string;
+    instagram?: string;
     password?: string;
+    role?: string;
+    roles?: string | Array<string | AuthorityEntity>;
     authorities?: AuthorityEntity[];
 }
 

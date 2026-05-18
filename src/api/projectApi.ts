@@ -1,14 +1,14 @@
 import { getHal, mergeHal, mergeHalArray, postHal, putHal, patchHal, deleteHal } from "./halClient";
 import type { AuthProvider } from "@/lib/authProvider";
-import { Project } from "@/types/project";
+import type { Project, ProjectEntity } from "@/types/project";
 
 export class ProjectService {
     constructor(private authProvider: AuthProvider) {
     }
 
     async getProjects(): Promise<Project[]> {
-        const resource = await getHal('/projects', this.authProvider);
-        const embedded = resource.embeddedArray('projects') || [];
+        const resource = await getHal("/projects", this.authProvider);
+        const embedded = resource.embeddedArray("projects") || [];
         return mergeHalArray<Project>(embedded);
     }
 

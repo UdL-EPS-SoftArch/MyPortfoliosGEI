@@ -15,7 +15,7 @@ export default function Loginbar() {
     const router = useRouter();
 
     function logout() {
-        deleteCookie("MYAPP_AUTH");
+        deleteCookie("MYPORTFOLIOS_AUTH");
         setUser(null);
         router.push("/");
     }
@@ -39,21 +39,21 @@ export default function Loginbar() {
         return () => {
             mounted = false;
         };
-    }, []);
+    }, [setUser]);
 
     if (user) {
         return (
             <div className="flex items-center gap-5">
                 <div className="flex items-center gap-2">
-                    <Avatar className="rounded-lg flex items-center justify-center bg-gray-200">
+                    <Avatar className="rounded-lg flex items-center justify-center bg-white/15 text-white">
                         <FontAwesomeIcon icon={faUser} className="h-4 w-4"/>
                     </Avatar>
-                    <Link href={`/users/${user.username}`}
+                    <Link href="/profile"
                           className="text-blue-600 text-md font-medium"> {user.username ?? "User"} </Link>
                 </div>
                 <button
                     onClick={logout}
-                    className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                    className="inline-flex items-center px-3 py-1.5 bg-white text-black rounded-md text-sm font-medium hover:bg-gray-200 transition"
                 >
                     Logout
                 </button>
@@ -62,11 +62,11 @@ export default function Loginbar() {
     }
 
     return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
             <Link href="/login"
-                  className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"> Login </Link>
+                  className="text-sm font-medium text-white/80 hover:text-white transition"> Sign in </Link>
             <Link href="/users/register"
-                  className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"> Register </Link>
+                  className="inline-flex items-center px-3 py-1.5 border border-white/40 text-white rounded-md text-sm hover:border-white transition"> Sign up </Link>
         </div>
     )
 
