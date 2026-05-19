@@ -289,7 +289,7 @@ export default function AdminPanel({
             }
 
             const service = new ProjectService(clientAuthProvider());
-            const updated = await service.updateProject(project, {
+            const updated = await service.updateProject(project.id, {
                 name: draft.name,
                 description: draft.description,
                 visibility: draft.visibility,
@@ -308,7 +308,7 @@ export default function AdminPanel({
             }
 
             const service = new ProjectService(clientAuthProvider());
-            await service.deleteProject(project);
+            await service.deleteProject(project.id);
             setProjects((items) => items.filter((item) => item.uri !== project.uri));
         });
     }
@@ -353,7 +353,7 @@ export default function AdminPanel({
             }
 
             const service = new ProjectService(clientAuthProvider());
-            const updated = await service.updateProject(project, { flagged: false });
+            const updated = await service.updateProject(project.id, {flagged: false});
             setProjects((items) => items.map((item) => item.uri === project.uri ? toProjectEntity(updated) : item));
         });
     }
@@ -409,7 +409,7 @@ export default function AdminPanel({
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-blue-950 pt-28 text-white">
+        <div className="min-h-screen bg-linear-to-br from-black via-slate-900 to-blue-950 pt-28 text-white">
             <main className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 pb-16 sm:px-10">
                 <header className="flex flex-col gap-5 border-b border-white/15 pb-8 lg:flex-row lg:items-end lg:justify-between">
                     <div className="space-y-3">

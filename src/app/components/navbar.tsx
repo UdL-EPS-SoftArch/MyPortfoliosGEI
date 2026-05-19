@@ -11,7 +11,8 @@ export default function Navbar() {
         {href: "/why", label: "Why MyPortfolios"},
         {href: "/explore", label: "Explore"},
         {href: "/portfolio", label: "Portfolio"},
-        {href: "/users", label: "Users", roles: ["ROLE_USER"]}
+        {href: "/users", label: "Users", roles: ["ROLE_USER"]},
+        {href: "/projects", label: "Projects"}
     ];
 
     const isAuthPage = pathname === "/login" || pathname === "/users/register";
