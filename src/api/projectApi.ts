@@ -1,6 +1,6 @@
 import { getHal, mergeHal, mergeHalArray, postHal, putHal, patchHal, deleteHal } from "./halClient";
 import type { AuthProvider } from "@/lib/authProvider";
-import type { Project, ProjectEntity } from "@/types/project";
+import type { Project } from "@/types/project";
 
 export class ProjectService {
     constructor(private authProvider: AuthProvider) {
@@ -22,7 +22,7 @@ export class ProjectService {
         return mergeHal<Project>(resource);
     }
 
-    async updateProject(id: string, project: Partial<Project>): Promise<Project> {
+    async updateProject(id: string | undefined, project: Partial<Project>): Promise<Project> {
         const resource = await putHal(`/projects/${id}`, project as any, this.authProvider);
         return mergeHal<Project>(resource);
     }
@@ -32,7 +32,7 @@ export class ProjectService {
         return mergeHal<Project>(resource);
     }
 
-    async deleteProject(id: string): Promise<void> {
+    async deleteProject(id: string | undefined): Promise<void> {
         await deleteHal(`/projects/${id}`, this.authProvider);
     }
 
