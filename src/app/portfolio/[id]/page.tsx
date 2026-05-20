@@ -49,6 +49,11 @@ export default async function PortfolioDetailPage(props: { params: Promise<{ id:
                                     {creator.username}
                                 </Link>
                             )}
+                            {portfolio.created && (
+                                <span>
+                                    Creado el {new Date(portfolio.created).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })}
+                                </span>
+                            )}
                         </div>
                     </div>
 
