@@ -4,6 +4,8 @@ import { PortfolioService } from "@/api/portfolioApi";
 import { UsersService } from "@/api/userApi";
 import { serverAuthProvider } from "@/lib/authProvider";
 import PortfolioWorkspace from "@/app/portfolio/components/portfolio-workspace";
+import { Badge } from "@/components/ui/badge";
+import { Visibility } from "@/types/portfolio";
 
 type Props = {
     searchParams?: Promise<{ q?: string | string[] }>;
@@ -11,6 +13,29 @@ type Props = {
 
 function getPortfolioId(uri?: string) {
     return uri?.split("/").pop() || "";
+}
+
+const VISIBILITY_BADGE_STYLES: Record<Visibility, string> = {
+    PUBLIC: "border-emerald-400/40 bg-emerald-500/20 text-emerald-100",
+    UNLISTED: "border-amber-400/40 bg-amber-500/20 text-amber-100",
+    RESTRICTED: "border-sky-400/40 bg-sky-500/20 text-sky-100",
+    PRIVATE: "border-rose-400/40 bg-rose-500/20 text-rose-100",
+};
+
+const VISIBILITY_LABELS: Record<Visibility, string> = {
+    PUBLIC: "Publico",
+    UNLISTED: "No listado",
+    RESTRICTED: "Restringido",
+    PRIVATE: "Privado",
+};
+
+function VisibilityBadge({ visibility }: { visibility?: Visibility }) {
+    if (!visibility) return null;
+    return (
+        <Badge variant="outline" className={VISIBILITY_BADGE_STYLES[visibility]}>
+            {VISIBILITY_LABELS[visibility]}
+        </Badge>
+    );
 }
 
 export default async function PortfolioListPage({ searchParams }: Props) {
@@ -87,7 +112,10 @@ export default async function PortfolioListPage({ searchParams }: Props) {
                                         )}
                                     </div>
                                     <div className="p-5">
-                                        <h2 className="text-xl font-bold">{portfolio.name}</h2>
+                                        <div className="flex items-start justify-between gap-3">
+                                            <h2 className="min-w-0 truncate text-xl font-bold">{portfolio.name}</h2>
+                                            <VisibilityBadge visibility={portfolio.visibility} />
+                                        </div>
                                         {portfolio.description && (
                                             <p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-300">
                                                 {portfolio.description}
