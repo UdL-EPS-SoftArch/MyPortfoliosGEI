@@ -29,9 +29,7 @@ export default function LoginPage() {
         const authorization = `Basic ${btoa(`${username}:${password}`)}`;
         setCookie("MYPORTFOLIOS_AUTH", authorization, {
             path: "/",
-            secure: true,
-            sameSite: "strict",
-            httpOnly: false,
+            sameSite: "lax",
         });
         const service = new UsersService(clientAuthProvider());
         const user = await service.getCurrentUser();
@@ -40,7 +38,8 @@ export default function LoginPage() {
 
     const onSubmit: SubmitHandler<FormValues> = (data) => {
         login(data.username, data.password).then(() => {
-            router.push(`/users/${data.username}`);
+            router.push("/portfolio");
+            router.refresh();
         }).catch(() => {
             deleteCookie("MYPORTFOLIOS_AUTH");
             setErrorMessage("Login failed");

@@ -12,9 +12,26 @@ export default async function PortfolioDetailPage(props: { params: Promise<{ id:
     const userService = new UsersService(serverAuthProvider);
     const { id } = await props.params;
     const [portfolio, currentUser] = await Promise.all([
-        service.getPortfolioById(id),
+        service.getPortfolioById(id).catch(() => null),
         userService.getCurrentUser().catch(() => null),
     ]);
+
+    if (!portfolio) {
+        return (
+            <PortfolioWorkspace ownPortfolios={[]} canManagePortfolios={Boolean(currentUser)}>
+                <div className="mx-auto w-full max-w-4xl rounded-md border border-white/15 bg-white/10 p-10 text-center text-white shadow-2xl backdrop-blur-md">
+                    <h1 className="text-2xl font-bold">Portfolio no encontrado</h1>
+                    <p className="mt-3 text-gray-300">
+                        No se ha podido cargar este portfolio.
+                    </p>
+                    <Link href="/portfolio" className="mt-6 inline-block text-sm font-medium text-blue-400 hover:text-blue-300 hover:underline">
+                        Volver al listado
+                    </Link>
+                </div>
+            </PortfolioWorkspace>
+        );
+    }
+
     const ownPortfolios = currentUser?.uri
         ? await service.getPortfoliosByCreator(currentUser).catch(() => [])
         : [];
@@ -22,8 +39,8 @@ export default async function PortfolioDetailPage(props: { params: Promise<{ id:
     let creator: User | null = null;
     try {
         creator = await service.getPortfolioRelation<User>(portfolio, "creator");
-    } catch (error) {
-        console.log(error);
+    } catch {
+        // creator not available
     }
 
     return (

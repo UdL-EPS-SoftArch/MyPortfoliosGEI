@@ -8,45 +8,41 @@ import { UsersService } from "@/api/userApi";
 import { deleteCookie } from "cookies-next";
 import { useAuth } from "@/app/components/authentication";
 import { Avatar } from "@/components/ui/avatar";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { User as UserIcon } from "lucide-react";
 
 export default function Loginbar() {
     const router = useRouter();
+    const { user, setUser } = useAuth();
 
     function logout() {
         deleteCookie("MYPORTFOLIOS_AUTH");
         setUser(null);
-        router.push("/");
+        router.push("/login");
     }
 
-    const {user, setUser} = useAuth();
-
     useEffect(() => {
-        let mounted = true;
+        if (user) return;
 
+        let mounted = true;
         async function load() {
             try {
                 const service = new UsersService(clientAuthProvider());
-                const user = await service.getCurrentUser();
-                setUser(user ?? null);
+                const data = await service.getCurrentUser();
+                if (mounted) setUser(data ?? null);
             } catch {
                 if (mounted) setUser(null);
             }
         }
-
         load();
-        return () => {
-            mounted = false;
-        };
-    }, [setUser]);
+        return () => { mounted = false; };
+    }, [user, setUser]);
 
     if (user) {
         return (
             <div className="flex items-center gap-5">
                 <div className="flex items-center gap-2">
                     <Avatar className="rounded-lg flex items-center justify-center bg-white/15 text-white">
-                        <FontAwesomeIcon icon={faUser} className="h-4 w-4"/>
+                        <UserIcon className="h-4 w-4" />
                     </Avatar>
                     <Link href={`/users/${user.username}`}
                           className="text-white text-md font-medium hover:text-gray-200 transition"> {user.username ?? "User"} </Link>

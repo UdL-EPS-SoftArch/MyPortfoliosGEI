@@ -20,7 +20,7 @@ export default async function PortfolioListPage({ searchParams }: Props) {
     const service = new PortfolioService(serverAuthProvider);
     const userService = new UsersService(serverAuthProvider);
     const [portfolios, currentUser] = await Promise.all([
-        service.getPortfolios(),
+        service.getPortfolios().catch(() => []),
         userService.getCurrentUser().catch(() => null),
     ]);
 

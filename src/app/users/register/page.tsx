@@ -9,8 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { User } from "@/types/user";
-import {UsersService} from "@/api/userApi";
-import {clientAuthProvider} from "@/lib/authProvider";
+import { UsersService } from "@/api/userApi";
+import { clientAuthProvider } from "@/lib/authProvider";
+import { useAuth } from "@/app/components/authentication";
+import { setCookie } from "cookies-next";
 
 type FormValues = {
     username: string;
@@ -20,7 +22,8 @@ type FormValues = {
 };
 
 export default function RegistrationPage() {
-    const service = new UsersService(clientAuthProvider())
+    const service = new UsersService(clientAuthProvider());
+    const { setUser } = useAuth();
     const {
         register,
         handleSubmit,
@@ -38,13 +41,26 @@ export default function RegistrationPage() {
 
     const router = useRouter();
 
-    const onSubmit: SubmitHandler<FormValues> = (data) => {
+    const onSubmit: SubmitHandler<FormValues> = async (data) => {
         setErrorMessage(null);
-        service.createUser(data as User).then(() => {
-            router.push("/login");
-        }).catch((err) => {
+        try {
+            await service.createUser(data as User);
+        } catch (err: any) {
             setErrorMessage(err.message || "Registration failed");
+            return;
+        }
+        const authorization = `Basic ${btoa(`${data.username}:${data.password}`)}`;
+        setCookie("MYPORTFOLIOS_AUTH", authorization, {
+            path: "/",
+            sameSite: "lax",
         });
+        setUser({
+            username: data.username,
+            email: data.email,
+            authorities: [{ authority: "ROLE_USER" }],
+        } as User);
+        router.push("/portfolio");
+        router.refresh();
     };
 
     return (
