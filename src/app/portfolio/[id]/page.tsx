@@ -6,6 +6,7 @@ import { serverAuthProvider } from "@/lib/authProvider";
 import { User } from "@/types/user";
 import EditPortfolioButton from "@/app/portfolio/components/edit-button";
 import PortfolioWorkspace from "@/app/portfolio/components/portfolio-workspace";
+import VisibilityBadge from "@/app/portfolio/components/visibility-badge";
 
 export default async function PortfolioDetailPage(props: { params: Promise<{ id: string }> }) {
     const service = new PortfolioService(serverAuthProvider);
@@ -58,12 +59,17 @@ export default async function PortfolioDetailPage(props: { params: Promise<{ id:
                         <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-5xl">
                             {portfolio.name}
                         </h1>
-                        <div className="mt-4 flex flex-wrap gap-3 text-sm text-gray-300">
-                            {portfolio.visibility && <span>{portfolio.visibility}</span>}
+                        <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-gray-300">
+                            <VisibilityBadge visibility={portfolio.visibility} />
                             {creator && (
                                 <Link href={`/users/${creator.username}`} className="hover:text-white hover:underline">
                                     {creator.username}
                                 </Link>
+                            )}
+                            {portfolio.created && (
+                                <span>
+                                    Creado el {new Date(portfolio.created).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })}
+                                </span>
                             )}
                         </div>
                     </div>

@@ -4,6 +4,7 @@ import { Search, FileText } from "lucide-react";
 import { Portfolio } from "@/types/portfolio";
 import CreatePortfolioButton from "@/app/portfolio/components/create-button";
 import DeletePortfolioButton from "@/app/portfolio/components/delete-button";
+import VisibilityBadge from "@/app/portfolio/components/visibility-badge";
 import Loginbar from "@/app/components/loginbar";
 
 type Props = {
@@ -30,10 +31,10 @@ export default function PortfolioWorkspace({
             <header className="sticky top-0 z-40 border-b border-white/15 bg-black/35 backdrop-blur-md">
                 <div className="grid min-h-20 w-full grid-cols-1 items-center gap-4 px-5 py-4 md:grid-cols-[240px_1fr_240px] md:px-8 lg:px-12">
                     <Link
-                        href="/portfolio"
-                        className="text-xl font-extrabold tracking-tight text-white transition hover:text-gray-200"
+                        href="/"
+                        className="flex w-auto items-center gap-2 text-xl font-bold tracking-tight text-white transition hover:text-gray-200"
                     >
-                        My_Portfolio
+                        MyPortfolios
                     </Link>
 
                     <form action="/portfolio" className="relative w-full max-w-2xl justify-self-center">
@@ -83,10 +84,17 @@ export default function PortfolioWorkspace({
                                         <div className="flex items-center gap-2">
                                             <Link
                                                 href={`/portfolio/${id}`}
-                                                className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-2 text-sm font-semibold text-white"
+                                                className="flex min-w-0 flex-1 flex-col gap-1 rounded-md px-2 py-2 text-sm font-semibold text-white"
                                             >
-                                                <FileText className="h-4 w-4 shrink-0 text-gray-300" />
-                                                <span className="truncate">{portfolio.name}</span>
+                                                <div className="flex items-center gap-2">
+                                                    <FileText className="h-4 w-4 shrink-0 text-gray-300" />
+                                                    <span className="truncate">{portfolio.name}</span>
+                                                </div>
+                                                {portfolio.visibility && (
+                                                    <div className="pl-6">
+                                                        <VisibilityBadge visibility={portfolio.visibility} />
+                                                    </div>
+                                                )}
                                             </Link>
                                             {id && (
                                                 <DeletePortfolioButton

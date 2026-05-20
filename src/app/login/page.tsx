@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { UsersService } from "@/api/userApi";
 import { clientAuthProvider } from "@/lib/authProvider";
+import { isAdminUser } from "@/lib/permissions";
 
 type FormValues = {
     username: string;
@@ -33,7 +34,11 @@ export default function LoginPage() {
         });
         const service = new UsersService(clientAuthProvider());
         const user = await service.getCurrentUser();
+        if (!user) {
+            throw new Error("Invalid credentials");
+        }
         setUser(user);
+        return user;
     }
 
     const onSubmit: SubmitHandler<FormValues> = (data) => {

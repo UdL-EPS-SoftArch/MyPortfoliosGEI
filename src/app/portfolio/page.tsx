@@ -4,6 +4,7 @@ import { PortfolioService } from "@/api/portfolioApi";
 import { UsersService } from "@/api/userApi";
 import { serverAuthProvider } from "@/lib/authProvider";
 import PortfolioWorkspace from "@/app/portfolio/components/portfolio-workspace";
+import VisibilityBadge from "@/app/portfolio/components/visibility-badge";
 
 type Props = {
     searchParams?: Promise<{ q?: string | string[] }>;
@@ -87,7 +88,10 @@ export default async function PortfolioListPage({ searchParams }: Props) {
                                         )}
                                     </div>
                                     <div className="p-5">
-                                        <h2 className="text-xl font-bold">{portfolio.name}</h2>
+                                        <div className="flex items-start justify-between gap-3">
+                                            <h2 className="min-w-0 truncate text-xl font-bold">{portfolio.name}</h2>
+                                            <VisibilityBadge visibility={portfolio.visibility} />
+                                        </div>
                                         {portfolio.description && (
                                             <p className="mt-3 line-clamp-3 text-sm leading-6 text-gray-300">
                                                 {portfolio.description}

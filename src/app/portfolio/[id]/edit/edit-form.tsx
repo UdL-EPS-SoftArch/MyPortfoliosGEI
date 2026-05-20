@@ -16,6 +16,7 @@ import { clientAuthProvider } from "@/lib/authProvider";
 type FormValues = {
     name: string;
     description: string;
+    image: string;
     visibility: Visibility;
 };
 
@@ -102,6 +103,17 @@ export default function EditPortfolioForm({ id, initialValues }: Props) {
                                 </div>
 
                                 <div className="space-y-2">
+                                    <Label htmlFor="image" className="text-gray-300 font-medium">URL de imagen</Label>
+                                    <Input
+                                        id="image"
+                                        type="url"
+                                        placeholder="https://..."
+                                        className="h-12 border-white/20 bg-black/20 px-4 text-white placeholder:text-gray-400 focus-visible:ring-white/40"
+                                        {...register("image")}
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
                                     <Label htmlFor="visibility" className="text-gray-300 font-medium">Visibilidad</Label>
                                     <select
                                         id="visibility"
@@ -110,6 +122,7 @@ export default function EditPortfolioForm({ id, initialValues }: Props) {
                                     >
                                         <option className="bg-slate-950" value="PUBLIC">Publico</option>
                                         <option className="bg-slate-950" value="UNLISTED">No listado</option>
+                                        <option className="bg-slate-950" value="RESTRICTED">Restringido</option>
                                         <option className="bg-slate-950" value="PRIVATE">Privado</option>
                                     </select>
                                 </div>
