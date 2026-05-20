@@ -13,6 +13,7 @@ export default async function EditPortfolioPage(props: { params: Promise<{ id: s
             initialValues={{
                 name: portfolio.name,
                 description: portfolio.description ?? "",
+                image: portfolio.image ?? "",
                 visibility: portfolio.visibility ?? "PUBLIC",
             }}
         />
