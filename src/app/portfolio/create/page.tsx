@@ -107,6 +107,7 @@ export default function CreatePortfolioPage() {
                                     >
                                         <option className="bg-slate-950" value="PUBLIC">Publico</option>
                                         <option className="bg-slate-950" value="UNLISTED">No listado</option>
+                                        <option className="bg-slate-950" value="RESTRICTED">Restringido</option>
                                         <option className="bg-slate-950" value="PRIVATE">Privado</option>
                                     </select>
                                 </div>
