@@ -7,7 +7,7 @@ import { Project } from "@/types/project";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Calendar, User as UserIcon, Globe, Lock, ArrowLeft, MoreHorizontal, LayoutGrid } from "lucide-react";
+import { Loader2, Calendar, User as UserIcon, Globe, Lock, ArrowLeft, Flag, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -20,6 +20,8 @@ export default function ProjectDetailPage({ params }: ProjectDetailPageProps) {
     const { authProvider, user: currentUser } = useAuth();
     const [project, setProject] = useState<Project | null>(null);
     const [loading, setLoading] = useState(true);
+    const [reporting, setReporting] = useState(false);
+    const [reportStatus, setReportStatus] = useState<string | null>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -37,6 +39,33 @@ export default function ProjectDetailPage({ params }: ProjectDetailPageProps) {
 
         fetchProject();
     }, [id, authProvider]);
+
+    async function reportProject() {
+        if (!currentUser) {
+            router.push("/login");
+            return;
+        }
+
+        if (project?.flagged) {
+            setReportStatus("This project is already reported.");
+            return;
+        }
+
+        setReporting(true);
+        setReportStatus(null);
+
+        try {
+            const service = new ProjectService(authProvider);
+            const updated = await service.patchProject(id, { flagged: true });
+            setProject(updated);
+            setReportStatus("Project reported for admin review.");
+        } catch (error) {
+            console.error("Error reporting project:", error);
+            setReportStatus("Could not report project.");
+        } finally {
+            setReporting(false);
+        }
+    }
 
     if (loading) {
         return (
@@ -73,14 +102,26 @@ export default function ProjectDetailPage({ params }: ProjectDetailPageProps) {
                         <ArrowLeft className="mr-2 h-4 w-4" /> Back
                     </Button>
                     <div className="flex gap-2">
-                        <Button variant="outline" size="icon" className="rounded-full shadow-sm">
-                            <MoreHorizontal className="h-4 w-4" />
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={reportProject}
+                            disabled={reporting || project.flagged}
+                            className="rounded-full shadow-sm"
+                        >
+                            {reporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Flag className="mr-2 h-4 w-4" />}
+                            {project.flagged ? "Reported" : "Report"}
                         </Button>
                         <Button asChild className="rounded-full shadow-lg">
                             <Link href={`/projects/${id}/edit`}>Edit Project</Link>
                         </Button>
                     </div>
                 </div>
+                {reportStatus && (
+                    <div className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200">
+                        {reportStatus}
+                    </div>
+                )}
 
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Main Content Area (Left) */}

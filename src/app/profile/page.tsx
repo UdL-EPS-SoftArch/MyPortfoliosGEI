@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { serverAuthProvider } from "@/lib/authProvider";
 import { UsersService } from "@/api/userApi";
 import { RecordService } from "@/api/recordApi";
-import { Record } from "@/types/record";
 import ProfileClient from "./ProfileClient";
 
 export default async function ProfilePage() {

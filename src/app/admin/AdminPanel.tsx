@@ -6,6 +6,7 @@ import { AlertCircle, Eye, EyeOff, FileText, FolderKanban, ImageIcon, Save, Sear
 import { AssetService } from "@/api/assetApi";
 import { PortfolioService } from "@/api/portfolioApi";
 import { ProjectService } from "@/api/projectApi";
+import { UsersService } from "@/api/userApi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -89,6 +90,14 @@ function roleLabel(roles: string) {
     if (hasRole(roles, "ROLE_ADMIN")) return "Admin";
     if (hasRole(roles, "ROLE_EDITOR")) return "Editor";
     return "User";
+}
+
+function userWithRoles(user: UserEntity, roles: string): UserEntity {
+    return {
+        ...user,
+        roles,
+        authorities: roles.split(",").map((authority) => ({ authority })),
+    };
 }
 
 function resourceKey(value?: string) {
@@ -373,23 +382,19 @@ export default function AdminPanel({
             if (!confirmed) return;
         }
 
-        // Backend role persistence is intentionally disabled here so the frontend branch
-        // does not require API changes. Demo users still update locally to show the flow.
-        if (!isDemoItem(user.uri ?? "")) {
-            setStatus("Role management is a frontend preview until the API supports writable roles.");
-            return;
-        }
-
         await runAction(
             user.username,
             `${currentUser.username} changed ${user.username} from ${roleLabel(previousRoles)} to ${roleLabel(roles)} at ${new Date().toLocaleString()}.`,
             "Could not update user roles",
             async () => {
-                setUsers((items) => items.map((item) => item.username === user.username ? {
-                    ...item,
-                    roles,
-                    authorities: roles.split(",").map((authority) => ({ authority })),
-                } : item));
+                if (isDemoItem(user.uri ?? "")) {
+                    setUsers((items) => items.map((item) => item.username === user.username ? userWithRoles(item, roles) : item));
+                    return;
+                }
+
+                const service = new UsersService(clientAuthProvider());
+                const updated = await service.updateUser(user.username, { roles });
+                setUsers((items) => items.map((item) => item.username === user.username ? userWithRoles({ ...item, ...updated, username: item.username }, roles) : item));
             }
         );
     }
