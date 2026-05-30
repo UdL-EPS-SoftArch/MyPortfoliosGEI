@@ -97,6 +97,11 @@ export default async function PortfolioListPage({ searchParams }: Props) {
                                                 {portfolio.description}
                                             </p>
                                         )}
+                                        {portfolio.created && (
+                                            <p className="mt-3 text-xs text-gray-400">
+                                                Creado el {new Date(portfolio.created).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })}
+                                            </p>
+                                        )}
                                     </div>
                                 </Link>
                             );
