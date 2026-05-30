@@ -8,12 +8,14 @@ const VISIBILITY_BADGE_STYLES: Record<Visibility, string> = {
     PRIVATE: "border-rose-400/40 bg-rose-500/20 text-rose-100",
 };
 
-const VISIBILITY_LABELS: Record<Visibility, string> = {
+export const VISIBILITY_LABELS: Record<Visibility, string> = {
     PUBLIC: "Publico",
     UNLISTED: "No listado",
     RESTRICTED: "Restringido",
     PRIVATE: "Privado",
 };
+
+export const VISIBILITY_ORDER: Visibility[] = ["PUBLIC", "UNLISTED", "RESTRICTED", "PRIVATE"];
 
 type Props = {
     visibility?: Visibility;

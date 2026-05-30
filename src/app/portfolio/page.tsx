@@ -4,20 +4,31 @@ import { PortfolioService } from "@/api/portfolioApi";
 import { UsersService } from "@/api/userApi";
 import { serverAuthProvider } from "@/lib/authProvider";
 import PortfolioWorkspace from "@/app/portfolio/components/portfolio-workspace";
-import VisibilityBadge from "@/app/portfolio/components/visibility-badge";
+import VisibilityBadge, { VISIBILITY_LABELS, VISIBILITY_ORDER } from "@/app/portfolio/components/visibility-badge";
+import { Visibility } from "@/types/portfolio";
 
 type Props = {
-    searchParams?: Promise<{ q?: string | string[] }>;
+    searchParams?: Promise<{ q?: string | string[]; visibility?: string | string[] }>;
 };
 
 function getPortfolioId(uri?: string) {
     return uri?.split("/").pop() || "";
 }
 
+function buildFilterHref(query: string, visibility?: Visibility) {
+    const params = new URLSearchParams();
+    if (query) params.set("q", query);
+    if (visibility) params.set("visibility", visibility);
+    const queryString = params.toString();
+    return queryString ? `/portfolio?${queryString}` : "/portfolio";
+}
+
 export default async function PortfolioListPage({ searchParams }: Props) {
     const params = await searchParams;
     const queryParam = Array.isArray(params?.q) ? params?.q[0] : params?.q;
     const searchQuery = queryParam?.trim() || "";
+    const visibilityParam = Array.isArray(params?.visibility) ? params?.visibility[0] : params?.visibility;
+    const activeVisibility = VISIBILITY_ORDER.find((option) => option === visibilityParam);
     const service = new PortfolioService(serverAuthProvider);
     const userService = new UsersService(serverAuthProvider);
     const [portfolios, currentUser] = await Promise.all([
@@ -32,12 +43,15 @@ export default async function PortfolioListPage({ searchParams }: Props) {
     const ownUris = new Set(ownPortfolios.map((portfolio) => portfolio.uri));
     const recommendedPortfolios = portfolios.filter((portfolio) => !ownUris.has(portfolio.uri));
     const basePortfolios = searchQuery ? portfolios : recommendedPortfolios.length ? recommendedPortfolios : portfolios;
-    const visiblePortfolios = searchQuery
+    const matchedPortfolios = searchQuery
         ? basePortfolios.filter((portfolio) => {
             const haystack = `${portfolio.name} ${portfolio.description || ""}`.toLowerCase();
             return haystack.includes(searchQuery.toLowerCase());
         })
         : basePortfolios;
+    const visiblePortfolios = activeVisibility
+        ? matchedPortfolios.filter((portfolio) => portfolio.visibility === activeVisibility)
+        : matchedPortfolios;
 
     return (
         <PortfolioWorkspace
@@ -58,6 +72,35 @@ export default async function PortfolioListPage({ searchParams }: Props) {
                             ? "Explora portfolios publicados por otros usuarios y abre cualquiera para ver su contenido."
                             : "Selecciona un portfolio propio en la barra lateral o revisa creaciones destacadas de la comunidad."}
                     </p>
+
+                    <div className="mt-5 flex flex-wrap gap-2">
+                        <Link
+                            href={buildFilterHref(searchQuery)}
+                            className={`rounded-full border px-3 py-1 text-sm font-medium transition ${
+                                activeVisibility
+                                    ? "border-white/20 bg-white/5 text-gray-300 hover:bg-white/10"
+                                    : "border-white/50 bg-white/20 text-white"
+                            }`}
+                        >
+                            Todos
+                        </Link>
+                        {VISIBILITY_ORDER.map((option) => {
+                            const isActive = option === activeVisibility;
+                            return (
+                                <Link
+                                    key={option}
+                                    href={buildFilterHref(searchQuery, option)}
+                                    className={`rounded-full border px-3 py-1 text-sm font-medium transition ${
+                                        isActive
+                                            ? "border-white/50 bg-white/20 text-white"
+                                            : "border-white/20 bg-white/5 text-gray-300 hover:bg-white/10"
+                                    }`}
+                                >
+                                    {VISIBILITY_LABELS[option]}
+                                </Link>
+                            );
+                        })}
+                    </div>
                 </div>
 
                 {visiblePortfolios.length === 0 ? (
