@@ -71,6 +71,11 @@ export default async function PortfolioDetailPage(props: { params: Promise<{ id:
                                     Creado el {new Date(portfolio.created).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })}
                                 </span>
                             )}
+                            {portfolio.modified && (!portfolio.created || new Date(portfolio.modified).getTime() !== new Date(portfolio.created).getTime()) && (
+                                <span>
+                                    Actualizado el {new Date(portfolio.modified).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" })}
+                                </span>
+                            )}
                         </div>
                     </div>
 
