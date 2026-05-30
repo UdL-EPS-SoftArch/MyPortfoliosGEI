@@ -101,6 +101,14 @@ export default async function PortfolioListPage({ searchParams }: Props) {
                             );
                         })}
                     </div>
+
+                    {visiblePortfolios.length > 0 && (
+                        <p className="mt-5 text-sm text-gray-400">
+                            {visiblePortfolios.length === 1
+                                ? "1 portfolio"
+                                : `${visiblePortfolios.length} portfolios`}
+                        </p>
+                    )}
                 </div>
 
                 {visiblePortfolios.length === 0 ? (
