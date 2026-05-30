@@ -57,6 +57,7 @@ export default async function PortfolioListPage({ searchParams }: Props) {
         <PortfolioWorkspace
             ownPortfolios={ownPortfolios}
             searchQuery={searchQuery}
+            activeVisibility={activeVisibility}
             canManagePortfolios={Boolean(currentUser)}
         >
             <section className="mx-auto w-full max-w-5xl">

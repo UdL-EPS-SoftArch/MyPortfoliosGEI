@@ -11,6 +11,7 @@ type Props = {
     ownPortfolios: Portfolio[];
     activePortfolioId?: string;
     searchQuery?: string;
+    activeVisibility?: string;
     canManagePortfolios?: boolean;
     children: ReactNode;
 };
@@ -23,6 +24,7 @@ export default function PortfolioWorkspace({
     ownPortfolios,
     activePortfolioId,
     searchQuery = "",
+    activeVisibility,
     canManagePortfolios = false,
     children,
 }: Props) {
@@ -39,6 +41,9 @@ export default function PortfolioWorkspace({
 
                     <form action="/portfolio" className="relative w-full max-w-2xl justify-self-center">
                         <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                        {activeVisibility && (
+                            <input type="hidden" name="visibility" value={activeVisibility} />
+                        )}
                         <input
                             name="q"
                             defaultValue={searchQuery}
