@@ -45,7 +45,7 @@ export default function LoginPage() {
 
     const onSubmit: SubmitHandler<FormValues> = (data) => {
         login(data.username, data.password).then((user) => {
-            router.push(isAdminUser(user) ? "/admin" : `/users/${encodeURIComponent(user.username)}`);
+            router.push(isAdminUser(user) ? "/admin" : "/profile");
         }).catch(() => {
             deleteCookie("MYPORTFOLIOS_AUTH");
             setErrorMessage("Login failed");
