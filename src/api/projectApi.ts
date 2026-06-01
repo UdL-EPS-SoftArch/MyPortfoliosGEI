@@ -13,7 +13,9 @@ export class ProjectService {
     }
 
     async getProjectsByCreator(user: any): Promise<Project[]> {
-        const resource = await getHal(`${user.uri}/projects`, this.authProvider);
+        const id = user.uri?.split("/").pop();
+        if (!id) return [];
+        const resource = await getHal(`/projects/search/findByCreatorId?id=${id}`, this.authProvider);
         const embedded = resource.embeddedArray("projects") || [];
         return mergeHalArray<Project>(embedded);
     }

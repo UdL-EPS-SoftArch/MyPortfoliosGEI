@@ -33,9 +33,8 @@ export default async function ProjectDetailPage(props: { params: Promise<{ id: s
     }
 
     const currentUser = await userService.getCurrentUser().catch(() => null);
-    const allProjects = await service.getProjects().catch(() => []);
     const ownProjects = currentUser?.uri
-        ? allProjects.filter((p) => p.creator === currentUser.uri)
+        ? await service.getProjectsByCreator(currentUser).catch(() => [])
         : [];
 
     const statusKey = project.status || "ToDo";
