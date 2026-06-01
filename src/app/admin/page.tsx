@@ -71,6 +71,7 @@ function toProjectEntity(project: Project): ProjectEntity {
         flagged: project.flagged,
         isPrivate: project.isPrivate,
         visibility: project.isPrivate === undefined ? project.visibility : (project.isPrivate ? "PRIVATE" : "PUBLIC"),
+        status: project.status,
     };
 }
 
