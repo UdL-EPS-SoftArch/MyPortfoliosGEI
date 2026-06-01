@@ -57,7 +57,8 @@ function toPortfolioEntity(portfolio: Portfolio): PortfolioEntity {
         id: portfolio.id,
         name: portfolio.name,
         description: portfolio.description,
-        visibility: portfolio.visibility,
+        isPrivate: portfolio.isPrivate,
+        visibility: portfolio.isPrivate === undefined ? portfolio.visibility : (portfolio.isPrivate ? "PRIVATE" : "PUBLIC"),
     };
 }
 
@@ -68,7 +69,8 @@ function toProjectEntity(project: Project): ProjectEntity {
         name: project.name,
         description: project.description,
         flagged: project.flagged,
-        visibility: project.visibility,
+        isPrivate: project.isPrivate,
+        visibility: project.isPrivate === undefined ? project.visibility : (project.isPrivate ? "PRIVATE" : "PUBLIC"),
     };
 }
 
