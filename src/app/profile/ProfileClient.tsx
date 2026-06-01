@@ -8,6 +8,7 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { UsersService } from "@/api/userApi";
 import { clientAuthProvider } from "@/lib/authProvider";
 import { useAuth } from "@/app/components/authentication";
+import Loginbar from "@/app/components/loginbar";
 
 type ProfileFormValues = {
     username: string;
@@ -142,6 +143,17 @@ export default function ProfileClient({ user, records }: ProfileClientProps) {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-blue-950 font-sans text-white">
+            <header className="sticky top-0 z-40 border-b border-white/15 bg-black/35 backdrop-blur-md">
+                <div className="grid min-h-20 w-full grid-cols-1 items-center gap-4 px-5 py-4 md:grid-cols-[240px_1fr_240px] md:px-8 lg:px-12">
+                    <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight text-white transition hover:text-gray-200">
+                        MyPortfolios
+                    </Link>
+                    <div />
+                    <div className="flex justify-start md:justify-end md:justify-self-end">
+                        <Loginbar />
+                    </div>
+                </div>
+            </header>
             <main className="mx-auto grid max-w-5xl gap-8 px-5 py-12 sm:px-8 lg:grid-cols-[280px_1fr] lg:px-14">
 
                 {/* Sidebar */}
