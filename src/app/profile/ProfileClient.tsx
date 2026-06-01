@@ -135,12 +135,20 @@ export default function ProfileClient({ user }: ProfileClientProps) {
     return (
         <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-blue-950 font-sans text-white">
             <header className="sticky top-0 z-40 border-b border-white/15 bg-black/35 backdrop-blur-md">
-                <div className="grid min-h-20 w-full grid-cols-1 items-center gap-4 px-5 py-4 md:grid-cols-[240px_1fr_240px] md:px-8 lg:px-12">
-                    <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight text-white transition hover:text-gray-200">
+                <div className="flex min-h-20 w-full items-center gap-4 px-5 py-4 md:px-8 lg:px-12">
+                    <Link href="/" className="shrink-0 text-xl font-bold tracking-tight text-white transition hover:text-gray-200">
                         MyPortfolios
                     </Link>
-                    <div />
-                    <div className="flex justify-start md:justify-end md:justify-self-end">
+                    <div className="ml-auto flex shrink-0 items-center gap-5">
+                        <Link href="/explore" className="text-sm font-medium text-gray-300 transition hover:text-white">
+                            Explore
+                        </Link>
+                        <Link href="/projects" className="text-sm font-medium text-gray-300 transition hover:text-white">
+                            Projects
+                        </Link>
+                        <Link href="/portfolio" className="text-sm font-medium text-gray-300 transition hover:text-white">
+                            Portfolios
+                        </Link>
                         <Loginbar />
                     </div>
                 </div>

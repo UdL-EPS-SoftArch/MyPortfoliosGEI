@@ -4,6 +4,7 @@ import { UsersService } from "@/api/userApi";
 import ProjectWorkspace from "@/app/projects/components/project-workspace";
 import { notFound } from "next/navigation";
 import EditProjectForm from "./edit-form";
+import { toPlainProject } from "@/types/project";
 
 export default async function EditProjectPage(props: { params: Promise<{ id: string }> }) {
     const { id } = await props.params;
@@ -34,7 +35,7 @@ export default async function EditProjectPage(props: { params: Promise<{ id: str
                     </p>
                 </div>
                 <div className="rounded-md border border-white/15 bg-white/10 p-6 backdrop-blur-md sm:p-8">
-                    <EditProjectForm projectId={id} initialData={project} />
+                    <EditProjectForm projectId={id} initialData={toPlainProject(project)} />
                 </div>
             </div>
         </ProjectWorkspace>

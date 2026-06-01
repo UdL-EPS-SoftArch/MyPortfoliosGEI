@@ -3,6 +3,7 @@ import { ProjectService } from "@/api/projectApi";
 import { UsersService } from "@/api/userApi";
 import ProjectWorkspace from "@/app/projects/components/project-workspace";
 import { ProjectCard } from "@/app/projects/components/project-card";
+import { toPlainProject } from "@/types/project";
 
 type Props = {
     searchParams?: Promise<{ q?: string | string[] }>;
@@ -64,7 +65,7 @@ export default async function ProjectsPage({ searchParams }: Props) {
                 ) : (
                     <div className="grid gap-5 lg:grid-cols-2">
                         {visibleProjects.map((project) => (
-                            <ProjectCard key={project.uri || project.name} project={project} />
+                            <ProjectCard key={project.uri || project.name} project={toPlainProject(project)} />
                         ))}
                     </div>
                 )}
