@@ -35,17 +35,8 @@ interface ProfileUser {
     authorities?: { authority: string }[];
 }
 
-interface ProfileRecord {
-    uri: string;
-    name: string;
-    description?: string;
-    created?: string;
-    modified?: string;
-}
-
 interface ProfileClientProps {
     user: ProfileUser;
-    records: ProfileRecord[];
 }
 
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
@@ -70,7 +61,7 @@ function DarkInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
     );
 }
 
-export default function ProfileClient({ user, records }: ProfileClientProps) {
+export default function ProfileClient({ user }: ProfileClientProps) {
     const { setUser } = useAuth();
     const service = new UsersService(clientAuthProvider());
 
@@ -190,15 +181,9 @@ export default function ProfileClient({ user, records }: ProfileClientProps) {
                         </div>
                     )}
 
-                    <div className="grid grid-cols-2 gap-3">
-                        <div className="rounded-md border border-white/10 bg-white/5 p-4 text-center">
-                            <p className="text-2xl font-bold text-white">{records.length}</p>
-                            <p className="mt-1 text-xs uppercase tracking-[0.2em] text-gray-400">Records</p>
-                        </div>
-                        <div className="rounded-md border border-white/10 bg-white/5 p-4 text-center">
-                            <p className="text-2xl font-bold text-white">{user.authorities?.length ?? 0}</p>
-                            <p className="mt-1 text-xs uppercase tracking-[0.2em] text-gray-400">Roles</p>
-                        </div>
+                    <div className="rounded-md border border-white/10 bg-white/5 p-4 text-center">
+                        <p className="text-2xl font-bold text-white">{user.authorities?.length ?? 0}</p>
+                        <p className="mt-1 text-xs uppercase tracking-[0.2em] text-gray-400">Roles</p>
                     </div>
                 </aside>
 
@@ -266,30 +251,6 @@ export default function ProfileClient({ user, records }: ProfileClientProps) {
                                 <p className="text-sm text-gray-500">Refresh the page to see your updated profile.</p>
                             </div>
                         </form>
-                    </div>
-
-                    {/* My Portfolios */}
-                    <div className="rounded-md border border-white/15 bg-white/10 p-6 backdrop-blur-md">
-                        <h3 className="mb-1 text-xl font-bold text-white">My Portfolios</h3>
-                        <p className="mb-6 text-sm text-gray-400">Quick access to your portfolios.</p>
-                        {records.length === 0 ? (
-                            <div className="rounded-md border border-white/10 bg-white/5 px-5 py-8 text-center text-sm text-gray-400">
-                                You have no portfolios yet.
-                            </div>
-                        ) : (
-                            <div className="grid gap-3">
-                                {records.map((record, index) => (
-                                    <div key={index} className="rounded-md border border-white/10 bg-white/5 p-4">
-                                        <Link href={record.uri} className="font-semibold text-white hover:text-gray-200">
-                                            {record.name}
-                                        </Link>
-                                        {record.description && (
-                                            <p className="mt-1 text-sm text-gray-400">{record.description}</p>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
                     </div>
 
                     {/* Security */}
