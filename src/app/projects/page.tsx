@@ -7,6 +7,7 @@ import { Project } from "@/types/project";
 import { ProjectCard } from "./components/project-card";
 import Link from "next/link";
 import { Plus, Search, Loader2 } from "lucide-react";
+import Loginbar from "@/app/components/loginbar";
 
 export default function ProjectsPage() {
     const { authProvider } = useAuth();
@@ -37,6 +38,17 @@ export default function ProjectsPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-blue-950 font-sans text-white">
+            <header className="sticky top-0 z-40 border-b border-white/15 bg-black/35 backdrop-blur-md">
+                <div className="grid min-h-20 w-full grid-cols-1 items-center gap-4 px-5 py-4 md:grid-cols-[240px_1fr_240px] md:px-8 lg:px-12">
+                    <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight text-white transition hover:text-gray-200">
+                        MyPortfolios
+                    </Link>
+                    <div />
+                    <div className="flex justify-start md:justify-end md:justify-self-end">
+                        <Loginbar />
+                    </div>
+                </div>
+            </header>
             <div className="mx-auto w-full max-w-5xl px-5 py-12 sm:px-8 lg:px-14">
                 <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div>

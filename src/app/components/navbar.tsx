@@ -15,7 +15,11 @@ export default function Navbar() {
     ];
 
     const isAuthPage = pathname === "/login" || pathname === "/users/register";
-    const isOwnWorkspace = pathname.startsWith("/portfolio") || pathname.startsWith("/profile");
+    const isOwnWorkspace =
+        pathname.startsWith("/portfolio") ||
+        pathname.startsWith("/profile") ||
+        pathname.startsWith("/projects") ||
+        pathname.startsWith("/explore");
 
     if (isOwnWorkspace) return null;
 
