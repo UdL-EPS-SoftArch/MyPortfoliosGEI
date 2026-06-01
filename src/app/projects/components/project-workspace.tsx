@@ -24,8 +24,8 @@ export default function ProjectWorkspace({
     children,
 }: Props) {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-blue-950 font-sans text-white">
-            <header className="sticky top-0 z-40 border-b border-white/15 bg-black/35 backdrop-blur-md">
+        <div className="min-h-screen bg-black font-sans text-white">
+            <header className="sticky top-0 z-40 border-b border-white/15 bg-black/50 backdrop-blur-md">
                 <div className="flex min-h-20 w-full items-center gap-4 px-5 py-4 md:px-8 lg:px-12">
                     <Link
                         href="/"

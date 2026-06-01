@@ -9,9 +9,7 @@ export default function Navbar() {
 
     const navLinks = [
         {href: "/why", label: "Why MyPortfolios"},
-        {href: "/explore", label: "Explore"},
-        {href: "/portfolio", label: "Portfolio"},
-        {href: "/projects", label: "Projects"}
+        {href: "/explore", label: "Explore"}
     ];
 
     const isAuthPage = pathname === "/login" || pathname === "/users/register";
