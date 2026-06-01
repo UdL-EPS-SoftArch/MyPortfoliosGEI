@@ -133,7 +133,7 @@ export default function ProfileClient({ user }: ProfileClientProps) {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-blue-950 font-sans text-white">
+        <div className="min-h-screen bg-black font-sans text-white">
             <header className="sticky top-0 z-40 border-b border-white/15 bg-black/35 backdrop-blur-md">
                 <div className="flex min-h-20 w-full items-center px-5 py-4 md:px-8 lg:px-12 justify-between">
                     <div className="flex items-center gap-5 flex-1">

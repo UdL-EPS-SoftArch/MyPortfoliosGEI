@@ -53,7 +53,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-black via-slate-900 to-blue-950 font-sans text-white">
+        <div className="flex min-h-screen items-center justify-center bg-black font-sans text-white">
             <main className="flex w-full max-w-3xl flex-col items-center justify-center py-32 px-16">
                 <div className="flex flex-col items-center w-full gap-6 text-center">
                     <Card className="w-full max-w-md bg-white/10 border-white/20 text-white backdrop-blur-md shadow-2xl">
