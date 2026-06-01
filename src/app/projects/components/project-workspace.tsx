@@ -1,8 +1,9 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Search, FileText } from "lucide-react";
+import { Search, FileText, Plus } from "lucide-react";
 import { Project } from "@/types/project";
 import Loginbar from "@/app/components/loginbar";
+import { Button } from "@/components/ui/button";
 
 type Props = {
     ownProjects: Project[];
@@ -73,11 +74,11 @@ export default function ProjectWorkspace({
                             My projects
                         </h2>
                         {canManageProjects && (
-                            <Link
-                                href="/projects/create"
-                                className="rounded-md border border-white/20 bg-white/10 px-2.5 py-1 text-xs font-semibold text-white transition hover:bg-white/15"
-                            >
-                                + New
+                            <Link href="/projects/create">
+                                <Button size="sm" className="gap-1 bg-white text-black hover:bg-gray-200">
+                                    <Plus className="h-4 w-4" />
+                                    New
+                                </Button>
                             </Link>
                         )}
                     </div>

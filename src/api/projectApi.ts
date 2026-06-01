@@ -12,6 +12,12 @@ export class ProjectService {
         return mergeHalArray<Project>(embedded);
     }
 
+    async getProjectsByCreator(user: any): Promise<Project[]> {
+        const resource = await getHal(`${user.uri}/projects`, this.authProvider);
+        const embedded = resource.embeddedArray("projects") || [];
+        return mergeHalArray<Project>(embedded);
+    }
+
     async getProjectById(id: string): Promise<Project> {
         const resource = await getHal(`/projects/${id}`, this.authProvider);
         return mergeHal<Project>(resource);

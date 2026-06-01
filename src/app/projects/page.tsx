@@ -24,10 +24,11 @@ export default async function ProjectsPage({ searchParams }: Props) {
     ]);
 
     const ownProjects = currentUser?.uri
-        ? projects.filter((p) => p.creator === currentUser.uri)
+        ? await service.getProjectsByCreator(currentUser).catch(() => [])
         : [];
 
-    const othersProjects = projects.filter((p) => !ownProjects.includes(p));
+    const ownUris = new Set(ownProjects.map(p => p.uri));
+    const othersProjects = projects.filter((p) => !ownUris.has(p.uri));
     const baseProjects = searchQuery ? projects : othersProjects.length ? othersProjects : projects;
 
     const visibleProjects = searchQuery
