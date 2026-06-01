@@ -98,28 +98,32 @@ export default function ExplorePage() {
         <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-blue-950 font-sans text-white">
             {/* Sticky header */}
             <header className="sticky top-0 z-40 border-b border-white/15 bg-black/35 backdrop-blur-md">
-                <div className="flex min-h-20 w-full items-center gap-4 px-5 py-4 md:px-8 lg:px-12">
-                    <Link href="/" className="shrink-0 text-xl font-bold tracking-tight text-white transition hover:text-gray-200">
-                        MyPortfolios
-                    </Link>
-
-                    <div className="relative mx-4 flex-1">
-                        <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-                        <input
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search portfolios..."
-                            className="h-11 w-full rounded-md border border-white/20 bg-white/10 pl-11 pr-4 text-sm text-white outline-none placeholder:text-gray-400 transition focus:border-white focus:ring-1 focus:ring-white/50"
-                        />
-                    </div>
-
-                    <div className="ml-auto flex shrink-0 items-center gap-5">
-                        <Link href="/portfolio" className="text-sm font-medium text-gray-300 transition hover:text-white">
+                <div className="flex min-h-20 w-full items-center px-5 py-4 md:px-8 lg:px-12">
+                    <div className="flex items-center gap-5 flex-1">
+                        <Link href="/" className="shrink-0 text-xl font-bold tracking-tight text-white transition hover:text-gray-200 mr-2">
+                            MyPortfolios
+                        </Link>
+                        <Link href="/portfolio" className="text-sm font-medium text-gray-300 transition hover:text-white hidden sm:block">
                             Portfolios
                         </Link>
-                        <Link href="/projects" className="text-sm font-medium text-gray-300 transition hover:text-white">
+                        <Link href="/projects" className="text-sm font-medium text-gray-300 transition hover:text-white hidden sm:block">
                             Projects
                         </Link>
+                    </div>
+
+                    <div className="flex justify-center flex-[2] max-w-xl px-4">
+                        <div className="relative w-full">
+                            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                            <input
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                placeholder="Search portfolios..."
+                                className="h-11 w-full rounded-md border border-white/20 bg-white/10 pl-11 pr-4 text-sm text-white outline-none placeholder:text-gray-400 transition focus:border-white focus:ring-1 focus:ring-white/50"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex flex-1 items-center justify-end">
                         <Loginbar />
                     </div>
                 </div>
