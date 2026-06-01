@@ -28,7 +28,7 @@ export default function PortfolioWorkspace({
     return (
         <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-blue-950 font-sans text-white">
             <header className="sticky top-0 z-40 border-b border-white/15 bg-black/35 backdrop-blur-md">
-                <div className="grid min-h-20 w-full grid-cols-1 items-center gap-4 px-5 py-4 md:grid-cols-[240px_1fr_240px] md:px-8 lg:px-12">
+                <div className="flex min-h-20 w-full items-center gap-4 px-5 py-4 md:px-8 lg:px-12">
                     <Link
                         href="/"
                         className="flex w-auto items-center gap-2 text-xl font-bold tracking-tight text-white transition hover:text-gray-200"
@@ -36,7 +36,7 @@ export default function PortfolioWorkspace({
                         MyPortfolios
                     </Link>
 
-                    <form action="/portfolio" className="relative w-full max-w-2xl justify-self-center">
+                    <form action="/portfolio" className="relative mx-4 w-full max-w-xl flex-1">
                         <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                         <input
                             name="q"
@@ -46,7 +46,19 @@ export default function PortfolioWorkspace({
                         />
                     </form>
 
-                    <div className="flex justify-start md:justify-end md:justify-self-end">
+                    <div className="ml-auto flex shrink-0 items-center gap-5">
+                        <Link
+                            href="/projects"
+                            className="text-sm font-medium text-gray-300 transition hover:text-white"
+                        >
+                            Projects
+                        </Link>
+                        <Link
+                            href="/explore"
+                            className="text-sm font-medium text-gray-300 transition hover:text-white"
+                        >
+                            Explore
+                        </Link>
                         <Loginbar />
                     </div>
                 </div>

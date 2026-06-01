@@ -187,11 +187,11 @@ export default function ExplorePage() {
         <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-blue-950 font-sans text-white">
             {/* Sticky header */}
             <header className="sticky top-0 z-40 border-b border-white/15 bg-black/35 backdrop-blur-md">
-                <div className="grid min-h-20 w-full grid-cols-1 items-center gap-4 px-5 py-4 md:grid-cols-[240px_1fr_240px] md:px-8 lg:px-12">
+                <div className="flex min-h-20 w-full items-center gap-4 px-5 py-4 md:px-8 lg:px-12">
                     <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight text-white transition hover:text-gray-200">
                         MyPortfolios
                     </Link>
-                    <form onSubmit={(e) => e.preventDefault()} className="relative w-full max-w-2xl justify-self-center">
+                    <form onSubmit={(e) => e.preventDefault()} className="relative mx-4 w-full max-w-xl flex-1">
                         <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                         <input
                             value={search}
@@ -200,7 +200,13 @@ export default function ExplorePage() {
                             className="h-11 w-full rounded-md border border-white/20 bg-white/10 pl-11 pr-4 text-sm text-white outline-none placeholder:text-gray-400 transition focus:border-white focus:ring-1 focus:ring-white/50"
                         />
                     </form>
-                    <div className="flex justify-start md:justify-end md:justify-self-end">
+                    <div className="ml-auto flex shrink-0 items-center gap-5">
+                        <Link href="/portfolio" className="text-sm font-medium text-gray-300 transition hover:text-white">
+                            Portfolios
+                        </Link>
+                        <Link href="/projects" className="text-sm font-medium text-gray-300 transition hover:text-white">
+                            Projects
+                        </Link>
                         <Loginbar />
                     </div>
                 </div>
