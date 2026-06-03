@@ -7,7 +7,6 @@ export interface PortfolioEntity {
     id?: string;
     name: string;
     description?: string;
-    isPrivate?: boolean;
     visibility?: Visibility;
     image?: string;
     created?: Date;
