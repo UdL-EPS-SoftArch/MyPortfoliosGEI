@@ -5,20 +5,33 @@ import { UsersService } from "@/api/userApi";
 import { serverAuthProvider } from "@/lib/authProvider";
 import PortfolioWorkspace from "@/app/portfolio/components/portfolio-workspace";
 import VisibilityBadge, { VISIBILITY_LABELS, VISIBILITY_ORDER } from "@/app/portfolio/components/visibility-badge";
-import { Visibility } from "@/types/portfolio";
+import { Portfolio, Visibility } from "@/types/portfolio";
 
 type Props = {
-    searchParams?: Promise<{ q?: string | string[]; visibility?: string | string[] }>;
+    searchParams?: Promise<{ q?: string | string[]; visibility?: string | string[]; sort?: string | string[] }>;
 };
+
+type SortKey = "recent" | "name";
+
+const SORT_OPTIONS: { value: SortKey; label: string }[] = [
+    { value: "recent", label: "Recientes" },
+    { value: "name", label: "Nombre" },
+];
 
 function getPortfolioId(uri?: string) {
     return uri?.split("/").pop() || "";
 }
 
-function buildFilterHref(query: string, visibility?: Visibility) {
+function getTimestamp(portfolio: Portfolio) {
+    const date = portfolio.modified || portfolio.created;
+    return date ? new Date(date).getTime() : 0;
+}
+
+function buildFilterHref({ query, visibility, sort }: { query?: string; visibility?: Visibility; sort?: SortKey }) {
     const params = new URLSearchParams();
     if (query) params.set("q", query);
     if (visibility) params.set("visibility", visibility);
+    if (sort && sort !== "recent") params.set("sort", sort);
     const queryString = params.toString();
     return queryString ? `/portfolio?${queryString}` : "/portfolio";
 }
@@ -29,6 +42,10 @@ export default async function PortfolioListPage({ searchParams }: Props) {
     const searchQuery = queryParam?.trim() || "";
     const visibilityParam = Array.isArray(params?.visibility) ? params?.visibility[0] : params?.visibility;
     const activeVisibility = VISIBILITY_ORDER.find((option) => option === visibilityParam);
+    const sortParam = Array.isArray(params?.sort) ? params?.sort[0] : params?.sort;
+    const activeSort: SortKey = SORT_OPTIONS.some((option) => option.value === sortParam)
+        ? (sortParam as SortKey)
+        : "recent";
     const service = new PortfolioService(serverAuthProvider);
     const userService = new UsersService(serverAuthProvider);
     const [portfolios, currentUser] = await Promise.all([
@@ -52,12 +69,18 @@ export default async function PortfolioListPage({ searchParams }: Props) {
     const visiblePortfolios = activeVisibility
         ? matchedPortfolios.filter((portfolio) => portfolio.visibility === activeVisibility)
         : matchedPortfolios;
+    const sortedPortfolios = [...visiblePortfolios].sort((a, b) =>
+        activeSort === "name"
+            ? a.name.localeCompare(b.name, "es")
+            : getTimestamp(b) - getTimestamp(a),
+    );
 
     return (
         <PortfolioWorkspace
             ownPortfolios={ownPortfolios}
             searchQuery={searchQuery}
             activeVisibility={activeVisibility}
+            activeSort={activeSort}
             canManagePortfolios={Boolean(currentUser)}
         >
             <section className="mx-auto w-full max-w-5xl">
@@ -76,7 +99,7 @@ export default async function PortfolioListPage({ searchParams }: Props) {
 
                     <div className="mt-5 flex flex-wrap gap-2">
                         <Link
-                            href={buildFilterHref(searchQuery)}
+                            href={buildFilterHref({ query: searchQuery, sort: activeSort })}
                             className={`rounded-full border px-3 py-1 text-sm font-medium transition ${
                                 activeVisibility
                                     ? "border-white/20 bg-white/5 text-gray-300 hover:bg-white/10"
@@ -90,7 +113,7 @@ export default async function PortfolioListPage({ searchParams }: Props) {
                             return (
                                 <Link
                                     key={option}
-                                    href={buildFilterHref(searchQuery, option)}
+                                    href={buildFilterHref({ query: searchQuery, visibility: option, sort: activeSort })}
                                     className={`rounded-full border px-3 py-1 text-sm font-medium transition ${
                                         isActive
                                             ? "border-white/50 bg-white/20 text-white"
@@ -103,22 +126,42 @@ export default async function PortfolioListPage({ searchParams }: Props) {
                         })}
                     </div>
 
-                    {visiblePortfolios.length > 0 && (
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-medium text-gray-400">Ordenar por</span>
+                        {SORT_OPTIONS.map((option) => {
+                            const isActive = option.value === activeSort;
+                            return (
+                                <Link
+                                    key={option.value}
+                                    href={buildFilterHref({ query: searchQuery, visibility: activeVisibility, sort: option.value })}
+                                    className={`rounded-full border px-3 py-1 text-sm font-medium transition ${
+                                        isActive
+                                            ? "border-white/50 bg-white/20 text-white"
+                                            : "border-white/20 bg-white/5 text-gray-300 hover:bg-white/10"
+                                    }`}
+                                >
+                                    {option.label}
+                                </Link>
+                            );
+                        })}
+                    </div>
+
+                    {sortedPortfolios.length > 0 && (
                         <p className="mt-5 text-sm text-gray-400">
-                            {visiblePortfolios.length === 1
+                            {sortedPortfolios.length === 1
                                 ? "1 portfolio"
-                                : `${visiblePortfolios.length} portfolios`}
+                                : `${sortedPortfolios.length} portfolios`}
                         </p>
                     )}
                 </div>
 
-                {visiblePortfolios.length === 0 ? (
+                {sortedPortfolios.length === 0 ? (
                     <div className="rounded-md border border-white/15 bg-white/10 p-8 text-gray-300 backdrop-blur-md">
                         No hay portfolios para mostrar.
                     </div>
                 ) : (
                     <div className="grid gap-5 lg:grid-cols-2">
-                        {visiblePortfolios.map((portfolio) => {
+                        {sortedPortfolios.map((portfolio) => {
                             const id = getPortfolioId(portfolio.uri);
                             return (
                                 <Link

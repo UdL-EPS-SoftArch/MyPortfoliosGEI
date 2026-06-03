@@ -12,6 +12,7 @@ type Props = {
     activePortfolioId?: string;
     searchQuery?: string;
     activeVisibility?: string;
+    activeSort?: string;
     canManagePortfolios?: boolean;
     children: ReactNode;
 };
@@ -25,6 +26,7 @@ export default function PortfolioWorkspace({
     activePortfolioId,
     searchQuery = "",
     activeVisibility,
+    activeSort,
     canManagePortfolios = false,
     children,
 }: Props) {
@@ -43,6 +45,9 @@ export default function PortfolioWorkspace({
                         <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                         {activeVisibility && (
                             <input type="hidden" name="visibility" value={activeVisibility} />
+                        )}
+                        {activeSort && activeSort !== "recent" && (
+                            <input type="hidden" name="sort" value={activeSort} />
                         )}
                         <input
                             name="q"
