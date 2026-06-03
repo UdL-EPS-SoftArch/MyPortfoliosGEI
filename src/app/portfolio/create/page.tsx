@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { PortfolioService } from "@/api/portfolioApi";
-import { Portfolio, Visibility } from "@/types/portfolio";
+import { Visibility } from "@/types/portfolio";
 import { clientAuthProvider } from "@/lib/authProvider";
 
 type FormValues = {
@@ -34,7 +34,7 @@ export default function CreatePortfolioPage() {
 
     const onSubmit: SubmitHandler<FormValues> = (data) => {
         setErrorMessage(null);
-        service.createPortfolio(data as Portfolio).then(() => {
+        service.createPortfolio(data).then(() => {
             router.push("/portfolio");
         }).catch((error: Error) => {
             setErrorMessage(error.message || "Failed to create portfolio");
@@ -108,6 +108,7 @@ export default function CreatePortfolioPage() {
                                         <option className="bg-slate-950" value="PUBLIC">Publico</option>
                                         <option className="bg-slate-950" value="UNLISTED">No listado</option>
                                         <option className="bg-slate-950" value="PRIVATE">Privado</option>
+                                        <option className="bg-slate-950" value="RESTRICTED">Restringido</option>
                                     </select>
                                 </div>
 

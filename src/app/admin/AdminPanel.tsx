@@ -44,7 +44,7 @@ type UserDraftMap = {
 
 type Tab = "reports" | "portfolios" | "projects" | "assets" | "creators" | "users";
 
-const visibilityOptions = ["PUBLIC", "PRIVATE", "RESTRICTED"];
+const visibilityOptions: Visibility[] = ["PUBLIC", "UNLISTED", "PRIVATE", "RESTRICTED"];
 const statusOptions: Status[] = ["ToDo", "In_Progress", "Done", "In_Revision"];
 const roleOptions = [
     { label: "User", value: "ROLE_USER" },

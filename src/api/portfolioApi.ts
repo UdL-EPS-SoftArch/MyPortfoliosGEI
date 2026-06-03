@@ -1,6 +1,6 @@
 import { deleteHal, getHal, mergeHal, mergeHalArray, patchHal, postHal } from "./halClient";
 import type { AuthProvider } from "@/lib/authProvider";
-import { Portfolio } from "@/types/portfolio";
+import { Portfolio, PortfolioEntity } from "@/types/portfolio";
 import { User } from "@/types/user";
 
 export class PortfolioService {
@@ -25,7 +25,7 @@ export class PortfolioService {
         return mergeHalArray<Portfolio>(embedded);
     }
 
-    async createPortfolio(portfolio: Portfolio): Promise<Portfolio> {
+    async createPortfolio(portfolio: Omit<PortfolioEntity, "uri">): Promise<Portfolio> {
         const resource = await postHal('/portfolios', portfolio, this.authProvider);
         return mergeHal<Portfolio>(resource);
     }

@@ -111,6 +111,7 @@ export default function EditPortfolioForm({ id, initialValues }: Props) {
                                         <option className="bg-slate-950" value="PUBLIC">Publico</option>
                                         <option className="bg-slate-950" value="UNLISTED">No listado</option>
                                         <option className="bg-slate-950" value="PRIVATE">Privado</option>
+                                        <option className="bg-slate-950" value="RESTRICTED">Restringido</option>
                                     </select>
                                 </div>
 
