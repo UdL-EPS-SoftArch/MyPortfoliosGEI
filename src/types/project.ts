@@ -10,9 +10,10 @@ export interface ProjectEntity {
     name: string;
     description?: string;
     flagged?: boolean;
-    isPrivate?: boolean;
     visibility?: Visibility;
     status?: Status;
+    /** URI of the portfolio this project belongs to (optional). */
+    portfolio?: string;
 }
 
 export type Project = ProjectEntity & Resource;

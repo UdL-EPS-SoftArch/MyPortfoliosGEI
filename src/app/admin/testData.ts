@@ -65,6 +65,7 @@ export const demoPortfolios: PortfolioEntity[] = [
     },
 ];
 
+
 export const demoProjects: ProjectEntity[] = [
     {
         uri: "demo:projects/legacy-repository",

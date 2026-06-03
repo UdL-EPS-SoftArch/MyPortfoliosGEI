@@ -1,4 +1,4 @@
-import { deleteHal, getHal, mergeHal, mergeHalArray, patchHal } from "./halClient";
+import { deleteHal, getHal, mergeHal, mergeHalArray, patchHal, postHal } from "./halClient";
 import type { AuthProvider } from "@/lib/authProvider";
 import type { Asset, AssetEntity } from "@/types/asset";
 
@@ -10,6 +10,25 @@ export class AssetService {
         const resource = await getHal("/assets", this.authProvider);
         const embedded = resource.embeddedArray("assets") || [];
         return mergeHalArray<Asset>(embedded);
+    }
+
+    async getAssetById(id: string): Promise<Asset> {
+        const resource = await getHal(`/assets/${id}`, this.authProvider);
+        return mergeHal<Asset>(resource);
+    }
+
+    async getAssetsByProject(projectUri: string): Promise<Asset[]> {
+        const resource = await getHal(
+            `/assets/search/findByBelongsTo?project=${projectUri}`,
+            this.authProvider
+        );
+        const embedded = resource.embeddedArray("assets") || [];
+        return mergeHalArray<Asset>(embedded);
+    }
+
+    async createAsset(asset: Omit<AssetEntity, "uri">): Promise<Asset> {
+        const resource = await postHal("/assets", asset, this.authProvider);
+        return mergeHal<Asset>(resource);
     }
 
     async updateAsset(asset: Pick<AssetEntity, "uri">, updates: Partial<AssetEntity>): Promise<Asset> {

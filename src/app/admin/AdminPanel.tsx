@@ -58,21 +58,12 @@ function isDemoItem(uri: string) {
     return uri.startsWith("demo:");
 }
 
-/** Maps the backend boolean field to the frontend Visibility enum. */
-function toVisibility(isPrivate?: boolean | null): Visibility {
-    return isPrivate ? "PRIVATE" : "PUBLIC";
-}
-
-/** Maps the frontend Visibility enum back to the backend boolean field. */
-function toIsPrivate(visibility?: Visibility): boolean {
-    return visibility !== "PUBLIC";
-}
 
 function buildDrafts(items: Array<AssetEntity | PortfolioEntity | ProjectEntity>) {
     return Object.fromEntries(items.map((item) => [item.uri, {
         name: item.name ?? "",
         description: item.description ?? "",
-        visibility: item.visibility ?? toVisibility("isPrivate" in item ? item.isPrivate : undefined),
+        visibility: item.visibility ?? "PUBLIC",
         flagged: "flagged" in item ? item.flagged ?? false : undefined,
         status: "status" in item ? item.status : undefined,
     }]));
@@ -144,8 +135,7 @@ function toPortfolioEntity(portfolio: Portfolio): PortfolioEntity {
         id: portfolio.id,
         name: portfolio.name,
         description: portfolio.description,
-        isPrivate: portfolio.isPrivate,
-        visibility: portfolio.visibility ?? toVisibility(portfolio.isPrivate),
+        visibility: portfolio.visibility ?? "PUBLIC",
     };
 }
 
@@ -156,8 +146,7 @@ function toProjectEntity(project: Project): ProjectEntity {
         name: project.name,
         description: project.description,
         flagged: project.flagged,
-        isPrivate: project.isPrivate,
-        visibility: project.visibility ?? toVisibility(project.isPrivate),
+        visibility: project.visibility ?? "PUBLIC",
         status: project.status,
     };
 }
@@ -274,7 +263,7 @@ export default function AdminPanel({
                 const updated = await service.updatePortfolio(portfolio.id, {
                     name: draft.name,
                     description: draft.description,
-                    isPrivate: toIsPrivate(draft.visibility),
+                    visibility: draft.visibility,
                 });
                 setPortfolios((items) => items.map((item) => item.uri === portfolio.uri ? toPortfolioEntity(updated) : item));
             }
@@ -308,7 +297,7 @@ export default function AdminPanel({
             const updated = await service.updateProject(project, {
                 name: draft.name,
                 description: draft.description,
-                isPrivate: toIsPrivate(draft.visibility),
+                visibility: draft.visibility,
                 flagged: draft.flagged,
                 status: draft.status,
             });
