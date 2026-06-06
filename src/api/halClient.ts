@@ -25,7 +25,7 @@ export async function getHal(path: string, authProvider: { getAuth: () => Promis
     return halfred.parse(await res.json());
 }
 
-export async function postHal(path: string, body: Resource, authProvider: { getAuth: () => Promise<string | null> }) {
+export async function postHal(path: string, body: object, authProvider: { getAuth: () => Promise<string | null> }) {
     const url = path.startsWith("http") ? path : `${API_BASE_URL}${path}`;
     const authorization = await authProvider.getAuth();
     const res = await fetch(url, {

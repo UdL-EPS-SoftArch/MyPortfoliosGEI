@@ -19,9 +19,8 @@ export default async function EditProjectPage(props: { params: Promise<{ id: str
     }
 
     const currentUser = await userService.getCurrentUser().catch(() => null);
-    const allProjects = await service.getProjects().catch(() => []);
     const ownProjects = currentUser?.uri
-        ? allProjects.filter((p) => p.creator === currentUser.uri)
+        ? await service.getProjectsByCreator(currentUser).catch(() => [])
         : [];
 
     return (
