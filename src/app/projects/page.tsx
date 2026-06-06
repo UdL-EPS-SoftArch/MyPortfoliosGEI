@@ -1,86 +1,76 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import { serverAuthProvider } from "@/lib/authProvider";
 import { ProjectService } from "@/api/projectApi";
-import { useAuth } from "@/app/components/authentication";
-import { Project } from "@/types/project";
-import { ProjectCard } from "./components/project-card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Plus, Search, Loader2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { UsersService } from "@/api/userApi";
+import ProjectWorkspace from "@/app/projects/components/project-workspace";
+import { ProjectCard } from "@/app/projects/components/project-card";
+import { toPlainProject } from "@/types/project";
 
-export default function ProjectsPage() {
-    const { authProvider } = useAuth();
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
+type Props = {
+    searchParams?: Promise<{ q?: string | string[] }>;
+};
 
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const service = new ProjectService(authProvider);
-                const data = await service.getProjects();
-                setProjects(data);
-            } catch (error) {
-                console.error("Error fetching projects:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
 
-        fetchProjects();
-    }, [authProvider]);
+export default async function ProjectsPage({ searchParams }: Props) {
+    const params = await searchParams;
+    const queryParam = Array.isArray(params?.q) ? params?.q[0] : params?.q;
+    const searchQuery = queryParam?.trim() || "";
 
-    const filteredProjects = projects.filter(p =>
-        p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.description?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const service = new ProjectService(serverAuthProvider);
+    const userService = new UsersService(serverAuthProvider);
+
+    const [projects, currentUser] = await Promise.all([
+        service.getProjects(),
+        userService.getCurrentUser().catch(() => null),
+    ]);
+
+    const ownProjects = currentUser?.uri
+        ? await service.getProjectsByCreator(currentUser).catch(() => [])
+        : [];
+
+    const ownUris = new Set(ownProjects.map(p => p.uri));
+    const othersProjects = projects.filter((p) => !ownUris.has(p.uri));
+    const baseProjects = searchQuery ? projects : othersProjects.length ? othersProjects : projects;
+
+    const visibleProjects = searchQuery
+        ? baseProjects.filter((p) => {
+              const haystack = `${p.name} ${p.description ?? ""}`.toLowerCase();
+              return haystack.includes(searchQuery.toLowerCase());
+          })
+        : baseProjects;
 
     return (
-        <div className="container mx-auto px-6 py-8">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-                    <p className="text-muted-foreground mt-1">
-                        Manage and explore public and shared projects.
+        <ProjectWorkspace
+            ownProjects={ownProjects}
+            searchQuery={searchQuery}
+            canManageProjects={Boolean(currentUser)}
+        >
+            <section className="mx-auto w-full max-w-5xl">
+                <div className="mb-8">
+                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gray-400">
+                        {searchQuery ? "Search results" : "Discover"}
+                    </p>
+                    <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                        {searchQuery ? `Projects for "${searchQuery}"` : "Projects"}
+                    </h1>
+                    <p className="mt-3 max-w-2xl text-base leading-7 text-gray-300">
+                        {searchQuery
+                            ? "Projects matching your search."
+                            : "Explore projects from the community or pick one of yours from the sidebar."}
                     </p>
                 </div>
-                <Button asChild className="shadow-lg hover:shadow-xl transition-all">
-                    <Link href="/projects/create">
-                        <Plus className="mr-2 h-4 w-4" /> New Project
-                    </Link>
-                </Button>
-            </div>
 
-            <div className="relative mb-8">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                    placeholder="Search projects by name or description..."
-                    className="pl-10 h-12 text-lg shadow-sm focus-visible:ring-2"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </div>
-
-            {loading ? (
-                <div className="flex justify-center items-center py-20">
-                    <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
-                </div>
-            ) : filteredProjects.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredProjects.map((project) => (
-                        <ProjectCard key={project.uri} project={project} />
-                    ))}
-                </div>
-            ) : (
-                <div className="text-center py-20 bg-slate-50 dark:bg-slate-900 rounded-xl border-2 border-dashed">
-                    <p className="text-xl text-muted-foreground">No projects found.</p>
-                    <Button variant="link" onClick={() => setSearchTerm("")} className="mt-2">
-                        Clear search filters
-                    </Button>
-                </div>
-            )}
-        </div>
+                {visibleProjects.length === 0 ? (
+                    <div className="rounded-md border border-white/15 bg-white/10 p-8 text-gray-300 backdrop-blur-md">
+                        No projects to show.
+                    </div>
+                ) : (
+                    <div className="grid gap-5 lg:grid-cols-2">
+                        {visibleProjects.map((project) => (
+                            <ProjectCard key={project.uri || project.name} project={toPlainProject(project)} />
+                        ))}
+                    </div>
+                )}
+            </section>
+        </ProjectWorkspace>
     );
 }

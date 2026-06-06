@@ -1,174 +1,165 @@
-"use client";
-
-import { useEffect, useState, use } from "react";
+import { serverAuthProvider } from "@/lib/authProvider";
 import { ProjectService } from "@/api/projectApi";
-import { useAuth } from "@/app/components/authentication";
-import { Project } from "@/types/project";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Loader2, Calendar, User as UserIcon, Globe, Lock, ArrowLeft, MoreHorizontal, LayoutGrid } from "lucide-react";
+import { UsersService } from "@/api/userApi";
+import ProjectWorkspace from "@/app/projects/components/project-workspace";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Calendar, Globe, Lock, Edit, LayoutGrid, UserIcon } from "lucide-react";
+import { notFound } from "next/navigation";
 
-interface ProjectDetailPageProps {
-    params: Promise<{ id: string }>;
-}
+const STATUS_LABELS: Record<string, string> = {
+    ToDo: "To Do",
+    In_Progress: "In Progress",
+    Done: "Done",
+    In_Revision: "In Revision",
+};
 
-export default function ProjectDetailPage({ params }: ProjectDetailPageProps) {
-    const { id } = use(params);
-    const { authProvider, user: currentUser } = useAuth();
-    const [project, setProject] = useState<Project | null>(null);
-    const [loading, setLoading] = useState(true);
-    const router = useRouter();
+const STATUS_COLORS: Record<string, string> = {
+    ToDo: "bg-slate-500/70",
+    In_Progress: "bg-blue-500/70",
+    Done: "bg-green-500/70",
+    In_Revision: "bg-yellow-500/70",
+};
 
-    useEffect(() => {
-        const fetchProject = async () => {
-            try {
-                const service = new ProjectService(authProvider);
-                const data = await service.getProjectById(id);
-                setProject(data);
-            } catch (error) {
-                console.error("Error fetching project:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+export default async function ProjectDetailPage(props: { params: Promise<{ id: string }> }) {
+    const { id } = await props.params;
+    const service = new ProjectService(serverAuthProvider);
+    const userService = new UsersService(serverAuthProvider);
 
-        fetchProject();
-    }, [id, authProvider]);
-
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center py-40">
-                <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
-            </div>
-        );
+    let project;
+    try {
+        project = await service.getProjectById(id);
+    } catch {
+        notFound();
     }
 
-    if (!project) {
-        return (
-            <div className="container mx-auto px-6 py-20 text-center">
-                <h1 className="text-2xl font-bold">Project not found</h1>
-                <Button variant="link" onClick={() => router.push("/projects")} className="mt-4">
-                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to projects
-                </Button>
-            </div>
-        );
-    }
+    const currentUser = await userService.getCurrentUser().catch(() => null);
+    const ownProjects = currentUser?.uri
+        ? await service.getProjectsByCreator(currentUser).catch(() => [])
+        : [];
 
-    const statusColors: Record<string, string> = {
-        ToDo: "bg-slate-500",
-        In_Progress: "bg-blue-500",
-        Done: "bg-green-500",
-        In_Revision: "bg-yellow-500",
-    };
+    const statusKey = project.status || "ToDo";
+    const isOwner = currentUser && project.creator === currentUser.uri;
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-black">
-            <div className="container mx-auto px-6 py-8">
-                {/* Header Actions */}
-                <div className="flex justify-between items-center mb-8">
-                    <Button variant="ghost" onClick={() => router.push("/projects")} className="hover:bg-white dark:hover:bg-slate-900 shadow-sm">
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Back
-                    </Button>
-                    <div className="flex gap-2">
-                        <Button variant="outline" size="icon" className="rounded-full shadow-sm">
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                        <Button asChild className="rounded-full shadow-lg">
-                            <Link href={`/projects/${id}/edit`}>Edit Project</Link>
-                        </Button>
-                    </div>
+        <ProjectWorkspace
+            ownProjects={ownProjects}
+            activeProjectId={id}
+            canManageProjects={Boolean(currentUser)}
+        >
+            <div className="mx-auto w-full max-w-6xl">
+                {/* Back link */}
+                <div className="mb-6">
+                    <Link
+                        href="/projects"
+                        className="text-sm text-gray-400 transition hover:text-white"
+                    >
+                        ← Back to projects
+                    </Link>
                 </div>
 
                 <div className="flex flex-col lg:flex-row gap-8">
-                    {/* Main Content Area (Left) */}
+                    {/* Main Content (Left) */}
                     <div className="flex-1 space-y-8">
-                        {/* Hero Section */}
-                        <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-sm border border-slate-200/50 dark:border-slate-800/50">
-                            <div className="flex items-center gap-3 mb-4">
-                                <Badge className={`${statusColors[project.status || "ToDo"]} text-white border-none px-3 py-1 text-sm rounded-full`}>
-                                    {project.status?.replace("_", " ")}
-                                </Badge>
+                        {/* Header */}
+                        <div className="rounded-md border border-white/15 bg-white/10 p-6 backdrop-blur-md sm:p-8">
+                            <div className="mb-4 flex flex-wrap items-center gap-3">
+                                <span className={`rounded-full px-3 py-1 text-sm font-semibold text-white ${STATUS_COLORS[statusKey]}`}>
+                                    {STATUS_LABELS[statusKey]}
+                                </span>
                                 {project.isPrivate ? (
-                                    <Badge variant="outline" className="rounded-full flex gap-1 items-center px-3 py-1">
-                                        <Lock size={12} className="text-amber-500" /> Private
-                                    </Badge>
+                                    <span className="flex items-center gap-1.5 text-sm text-amber-400">
+                                        <Lock className="h-3.5 w-3.5" /> Private
+                                    </span>
                                 ) : (
-                                    <Badge variant="outline" className="rounded-full flex gap-1 items-center px-3 py-1">
-                                        <Globe size={12} className="text-blue-500" /> Public
-                                    </Badge>
+                                    <span className="flex items-center gap-1.5 text-sm text-blue-400">
+                                        <Globe className="h-3.5 w-3.5" /> Public
+                                    </span>
                                 )}
                             </div>
-                            <h1 className="text-5xl font-black tracking-tight mb-4 text-slate-900 dark:text-white">
-                                {project.name}
-                            </h1>
-                            <p className="text-xl text-slate-600 dark:text-slate-400 leading-relaxed max-w-3xl">
-                                {project.description || "This project doesn't have a description yet. Add one to help others understand your goals."}
-                            </p>
+
+                            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                                <div>
+                                    <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+                                        {project.name}
+                                    </h1>
+                                    {project.description && (
+                                        <p className="mt-4 max-w-2xl text-lg leading-8 text-gray-300">
+                                            {project.description}
+                                        </p>
+                                    )}
+                                </div>
+
+                                {isOwner && (
+                                    <Link
+                                        href={`/projects/${id}/edit`}
+                                        className="flex shrink-0 items-center gap-2 rounded-md border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
+                                    >
+                                        <Edit className="h-4 w-4" /> Edit
+                                    </Link>
+                                )}
+                            </div>
                         </div>
 
                         {/* Content Grid (Placeholders for Assets as per Sketch) */}
                         <div className="grid grid-cols-6 grid-rows-4 gap-4 h-[600px]">
-                            <div className="col-span-2 row-span-2 bg-blue-100 dark:bg-blue-900/20 rounded-3xl border-2 border-dashed border-blue-200 dark:border-blue-800 flex items-center justify-center animate-pulse">
-                                <LayoutGrid size={40} className="text-blue-300 dark:text-blue-700" />
+                            <div className="col-span-2 row-span-2 rounded-md border-2 border-dashed border-white/20 bg-white/5 flex items-center justify-center animate-pulse">
+                                <LayoutGrid size={40} className="text-gray-500" />
                             </div>
-                            <div className="col-span-4 row-span-3 bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200/50 dark:border-slate-800/50 flex items-center justify-center group overflow-hidden relative">
-                                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10" />
-                                <span className="text-slate-400 dark:text-slate-600 font-medium relative z-10">Main Content Area</span>
+                            <div className="col-span-4 row-span-3 rounded-md shadow-sm border border-white/15 bg-white/10 flex items-center justify-center group overflow-hidden relative">
+                                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/0" />
+                                <span className="text-gray-400 font-medium relative z-10">Main Content Area</span>
                             </div>
-                            <div className="col-span-2 row-span-2 bg-indigo-100 dark:bg-indigo-900/20 rounded-3xl border-2 border-dashed border-indigo-200 dark:border-indigo-800 flex items-center justify-center animate-pulse">
-                                <LayoutGrid size={32} className="text-indigo-300 dark:text-indigo-700" />
+                            <div className="col-span-2 row-span-2 rounded-md border-2 border-dashed border-white/20 bg-white/5 flex items-center justify-center animate-pulse">
+                                <LayoutGrid size={32} className="text-gray-500" />
                             </div>
-                            <div className="col-span-2 row-span-1 bg-slate-200/50 dark:bg-slate-800/50 rounded-3xl flex items-center justify-center">
-                                <span className="text-xs text-slate-400 uppercase tracking-widest font-bold">Upcoming</span>
+                            <div className="col-span-2 row-span-1 bg-white/5 border border-white/10 rounded-md flex items-center justify-center">
+                                <span className="text-xs text-gray-500 uppercase tracking-widest font-bold">Upcoming</span>
                             </div>
-                            <div className="col-span-2 row-span-1 bg-slate-200/50 dark:bg-slate-800/50 rounded-3xl flex items-center justify-center">
-                                <span className="text-xs text-slate-400 uppercase tracking-widest font-bold">Upcoming</span>
+                            <div className="col-span-2 row-span-1 bg-white/5 border border-white/10 rounded-md flex items-center justify-center">
+                                <span className="text-xs text-gray-500 uppercase tracking-widest font-bold">Upcoming</span>
                             </div>
                         </div>
                     </div>
 
                     {/* Sidebar (Right) */}
-                    <div className="lg:w-96 space-y-6">
-                        <Card className="rounded-3xl shadow-xl border-none overflow-hidden bg-white dark:bg-slate-900">
-                            <CardContent className="p-8">
+                    <div className="lg:w-80 space-y-6">
+                        <div className="rounded-md border border-white/15 bg-white/10 backdrop-blur-md overflow-hidden">
+                            <div className="p-6">
                                 <div className="space-y-8">
                                     <div>
-                                        <h2 className="text-sm font-bold uppercase tracking-widest text-blue-600 mb-6">Hola! 👋</h2>
+                                        <h2 className="text-sm font-bold uppercase tracking-widest text-gray-400 mb-6">Hola! 👋</h2>
                                         <div className="space-y-6">
                                             <div className="flex items-start gap-4">
-                                                <div className="bg-slate-100 dark:bg-slate-800 p-3 rounded-2xl">
-                                                    <UserIcon size={20} className="text-slate-600 dark:text-slate-300" />
+                                                <div className="bg-white/10 p-3 rounded-md">
+                                                    <UserIcon size={20} className="text-gray-300" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">Creator</p>
-                                                    <p className="font-semibold text-slate-900 dark:text-white truncate max-w-[200px]">
+                                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-tight">Creator</p>
+                                                    <p className="font-semibold text-white truncate max-w-[150px]">
                                                         {project.creator ? "Project Owner" : "Unknown User"}
                                                     </p>
                                                 </div>
                                             </div>
 
                                             <div className="flex items-start gap-4">
-                                                <div className="bg-slate-100 dark:bg-slate-800 p-3 rounded-2xl">
-                                                    <Calendar size={20} className="text-slate-600 dark:text-slate-300" />
+                                                <div className="bg-white/10 p-3 rounded-md">
+                                                    <Calendar size={20} className="text-gray-300" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">Created On</p>
-                                                    <p className="font-semibold text-slate-900 dark:text-white">
+                                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-tight">Created On</p>
+                                                    <p className="font-semibold text-white">
                                                         {project.created ? new Date(project.created).toLocaleDateString(undefined, { dateStyle: 'long' }) : 'N/A'}
                                                     </p>
                                                 </div>
                                             </div>
 
                                             <div className="flex items-start gap-4">
-                                                <div className="bg-slate-100 dark:bg-slate-800 p-3 rounded-2xl">
-                                                    <Calendar size={20} className="text-slate-600 dark:text-slate-300" />
+                                                <div className="bg-white/10 p-3 rounded-md">
+                                                    <Calendar size={20} className="text-gray-300" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">Last Modified</p>
-                                                    <p className="font-semibold text-slate-900 dark:text-white">
+                                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-tight">Last Modified</p>
+                                                    <p className="font-semibold text-white">
                                                         {project.lastModified ? new Date(project.lastModified).toLocaleDateString(undefined, { dateStyle: 'long' }) : 'N/A'}
                                                     </p>
                                                 </div>
@@ -176,28 +167,28 @@ export default function ProjectDetailPage({ params }: ProjectDetailPageProps) {
                                         </div>
                                     </div>
 
-                                    <div className="pt-8 border-t border-slate-100 dark:border-slate-800">
-                                        <Button className="w-full rounded-2xl h-12 font-bold shadow-md hover:shadow-lg transition-all" variant="secondary">
+                                    <div className="pt-6 border-t border-white/10">
+                                        <button className="w-full rounded-md bg-white/10 hover:bg-white/20 transition-all text-white h-10 font-bold shadow-md border border-white/15">
                                             Manage Access
-                                        </Button>
+                                        </button>
                                     </div>
                                 </div>
-                            </CardContent>
-                        </Card>
+                            </div>
+                        </div>
 
                         {/* Additional Sidebar Block */}
-                        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-lg shadow-blue-500/20">
-                            <h3 className="font-bold text-xl mb-2">Project Insights</h3>
-                            <p className="text-blue-100 text-sm mb-6 leading-relaxed">
+                        <div className="bg-gradient-to-br from-indigo-900/40 to-blue-900/40 border border-indigo-500/30 rounded-md p-6 text-white shadow-lg">
+                            <h3 className="font-bold text-lg mb-2">Project Insights</h3>
+                            <p className="text-gray-300 text-sm mb-6 leading-relaxed">
                                 Soon you will be able to see detailed analytics and contribution graphs here.
                             </p>
-                            <Button className="w-full bg-white/20 hover:bg-white/30 border-none text-white font-bold rounded-xl h-11 backdrop-blur-md">
+                            <button className="w-full bg-indigo-500/20 hover:bg-indigo-500/40 border border-indigo-400/30 text-white font-bold rounded-md h-10 backdrop-blur-md transition-all">
                                 View Analytics
-                            </Button>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </ProjectWorkspace>
     );
 }

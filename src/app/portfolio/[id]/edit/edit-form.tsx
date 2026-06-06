@@ -45,7 +45,7 @@ export default function EditPortfolioForm({ id, initialValues }: Props) {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-black via-slate-900 to-blue-950 px-5 py-24 font-sans text-white">
+        <div className="flex min-h-screen items-center justify-center bg-black px-5 py-24 font-sans text-white">
             <main className="w-full max-w-2xl">
                 <div className="mb-8 text-center sm:text-left">
                     <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gray-400">

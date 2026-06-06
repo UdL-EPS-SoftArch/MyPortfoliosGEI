@@ -20,3 +20,21 @@ export interface ProjectEntity {
 }
 
 export type Project = ProjectEntity & Resource;
+
+export function toPlainProject(project: Project): Project {
+    return {
+        uri: project.uri,
+        id: project.id,
+        name: project.name,
+        description: project.description,
+        flagged: project.flagged,
+        status: project.status,
+        isPrivate: project.isPrivate,
+        created: project.created,
+        lastModified: project.lastModified,
+        creator: project.creator,
+        moderator: project.moderator,
+        project: project.project,
+        visibility: project.visibility,
+    } as Project;
+}
