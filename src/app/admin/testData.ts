@@ -65,6 +65,7 @@ export const demoPortfolios: PortfolioEntity[] = [
     },
 ];
 
+
 export const demoProjects: ProjectEntity[] = [
     {
         uri: "demo:projects/legacy-repository",
@@ -73,6 +74,7 @@ export const demoProjects: ProjectEntity[] = [
         description: "Reported for outdated credentials in a public README.",
         flagged: true,
         visibility: "PUBLIC",
+        status: "In_Revision",
     },
     {
         uri: "demo:projects/private-dashboard",
@@ -81,6 +83,7 @@ export const demoProjects: ProjectEntity[] = [
         description: "Internal dashboard project with collaborator-only access.",
         flagged: false,
         visibility: "PRIVATE",
+        status: "In_Progress",
     },
     {
         uri: "demo:projects/copyright-report",
@@ -89,6 +92,7 @@ export const demoProjects: ProjectEntity[] = [
         description: "Reported by a user for duplicated assets.",
         flagged: true,
         visibility: "RESTRICTED",
+        status: "ToDo",
     },
 ];
 

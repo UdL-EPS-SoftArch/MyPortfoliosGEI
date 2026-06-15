@@ -13,7 +13,7 @@ import { clientAuthProvider } from "@/lib/authProvider";
 import type { Asset, AssetEntity } from "@/types/asset";
 import type { CreatorEntity } from "@/types/creator";
 import type { Portfolio, PortfolioEntity, Visibility } from "@/types/portfolio";
-import type { Project, ProjectEntity } from "@/types/project";
+import type { Project, ProjectEntity, Status } from "@/types/project";
 import type { UserEntity } from "@/types/user";
 
 type AdminPanelProps = {
@@ -31,6 +31,7 @@ type Draft = {
     description: string;
     visibility?: Visibility;
     flagged?: boolean;
+    status?: Status;
 };
 
 type DraftMap = {
@@ -43,7 +44,8 @@ type UserDraftMap = {
 
 type Tab = "reports" | "portfolios" | "projects" | "assets" | "creators" | "users";
 
-const visibilityOptions = ["PUBLIC", "PRIVATE", "RESTRICTED"];
+const visibilityOptions: Visibility[] = ["PUBLIC", "UNLISTED", "PRIVATE", "RESTRICTED"];
+const statusOptions: Status[] = ["ToDo", "In_Progress", "Done", "In_Revision"];
 const roleOptions = [
     { label: "User", value: "ROLE_USER" },
     { label: "Editor", value: "ROLE_USER,ROLE_EDITOR" },
@@ -56,12 +58,14 @@ function isDemoItem(uri: string) {
     return uri.startsWith("demo:");
 }
 
+
 function buildDrafts(items: Array<AssetEntity | PortfolioEntity | ProjectEntity>) {
     return Object.fromEntries(items.map((item) => [item.uri, {
         name: item.name ?? "",
         description: item.description ?? "",
-        visibility: item.visibility ?? "PRIVATE",
+        visibility: item.visibility ?? "PUBLIC",
         flagged: "flagged" in item ? item.flagged ?? false : undefined,
+        status: "status" in item ? item.status : undefined,
     }]));
 }
 
@@ -131,7 +135,7 @@ function toPortfolioEntity(portfolio: Portfolio): PortfolioEntity {
         id: portfolio.id,
         name: portfolio.name,
         description: portfolio.description,
-        visibility: portfolio.visibility,
+        visibility: portfolio.visibility ?? "PUBLIC",
     };
 }
 
@@ -142,7 +146,8 @@ function toProjectEntity(project: Project): ProjectEntity {
         name: project.name,
         description: project.description,
         flagged: project.flagged,
-        visibility: project.visibility,
+        visibility: project.visibility ?? "PUBLIC",
+        status: project.status,
     };
 }
 
@@ -294,6 +299,7 @@ export default function AdminPanel({
                 description: draft.description,
                 visibility: draft.visibility,
                 flagged: draft.flagged,
+                status: draft.status,
             });
             setProjects((items) => items.map((item) => item.uri === project.uri ? toProjectEntity(updated) : item));
         });
@@ -499,8 +505,8 @@ export default function AdminPanel({
                     <EditableCollection
                         items={projects}
                         drafts={projectDrafts}
-                        columns="md:grid-cols-[1fr_1.1fr_150px_130px_120px]"
-                        labels={["Project", "Description", "Visibility", "Reported", "Actions"]}
+                        columns="md:grid-cols-[1fr_1.1fr_150px_160px_130px_120px]"
+                        labels={["Project", "Description", "Visibility", "Status", "Reported", "Actions"]}
                         onDraftChange={(uri, updates) => updateDraft(setProjectDrafts, uri, updates)}
                         onSave={saveProject}
                         onDelete={deleteProject}
@@ -508,6 +514,7 @@ export default function AdminPanel({
                         emptyLabel="No projects found"
                         hasFlagged
                         hasVisibility
+                        hasStatus
                     />
                 )}
 
@@ -694,6 +701,7 @@ function EditableCollection<TItem extends AssetEntity | PortfolioEntity | Projec
     emptyLabel,
     hasFlagged = false,
     hasVisibility = false,
+    hasStatus = false,
 }: {
     items: TItem[];
     drafts: DraftMap;
@@ -706,6 +714,7 @@ function EditableCollection<TItem extends AssetEntity | PortfolioEntity | Projec
     emptyLabel: string;
     hasFlagged?: boolean;
     hasVisibility?: boolean;
+    hasStatus?: boolean;
 }) {
     return (
         <section className="overflow-hidden rounded-md border border-white/15 bg-white/10 shadow-2xl backdrop-blur-md">
@@ -720,6 +729,9 @@ function EditableCollection<TItem extends AssetEntity | PortfolioEntity | Projec
                         <Textarea value={draft.description} onChange={(event) => onDraftChange(item.uri, { description: event.target.value })} className={textareaClassName} />
                         {hasVisibility && (
                             <VisibilitySelect value={draft.visibility ?? "PRIVATE"} onChange={(visibility) => onDraftChange(item.uri, { visibility })} />
+                        )}
+                        {hasStatus && (
+                            <StatusSelect value={draft.status ?? "ToDo"} onChange={(status) => onDraftChange(item.uri, { status })} />
                         )}
                         {hasFlagged && (
                             <label className="flex h-9 items-center gap-2 text-sm text-gray-200">
@@ -768,6 +780,20 @@ function VisibilitySelect({ value, onChange }: { value: Visibility; onChange: (v
                 ))}
             </select>
         </label>
+    );
+}
+
+function StatusSelect({ value, onChange }: { value: Status; onChange: (value: Status) => void }) {
+    return (
+        <select
+            value={value}
+            onChange={(event) => onChange(event.target.value as Status)}
+            className="h-9 w-full rounded-md border border-white/20 bg-black/20 px-3 text-sm text-white shadow-xs outline-none transition focus:border-white/40 focus:ring-2 focus:ring-white/20"
+        >
+            {statusOptions.map((option) => (
+                <option key={option} value={option}>{option.replace("_", " ")}</option>
+            ))}
+        </select>
     );
 }
 

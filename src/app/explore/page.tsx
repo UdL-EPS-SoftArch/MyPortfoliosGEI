@@ -74,7 +74,6 @@ export default function ExplorePage() {
     const [itemType, setItemType] = useState<ItemType>("all");
 
     useEffect(() => {
-        setLoading(true);
         Promise.all([
             new PortfolioService(authProvider).getPortfolios().catch(() => []),
             new ProjectService(authProvider).getProjects().catch(() => [])

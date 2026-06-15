@@ -18,6 +18,7 @@ const statusColors: Record<string, string> = {
 export function ProjectCard({ project }: ProjectCardProps) {
     const id = project.uri.split("/").pop();
     const statusKey = project.status || "ToDo";
+    const isPrivate = project.isPrivate ?? (project.visibility === "PRIVATE" || project.visibility === "RESTRICTED");
 
     return (
         <div className="group overflow-hidden rounded-md border border-white/15 bg-white/10 text-white shadow-2xl backdrop-blur-md transition hover:border-white/40 hover:bg-white/15">
@@ -33,7 +34,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
                 </p>
                 <div className="mt-4 space-y-1.5 text-sm text-gray-400">
                     <div className="flex items-center gap-2">
-                        {project.isPrivate ? (
+                        {isPrivate ? (
                             <><Lock size={13} className="text-amber-400" /> Private</>
                         ) : (
                             <><Globe size={13} className="text-blue-400" /> Public</>

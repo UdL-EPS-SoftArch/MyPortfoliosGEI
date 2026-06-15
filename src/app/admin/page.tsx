@@ -57,7 +57,7 @@ function toPortfolioEntity(portfolio: Portfolio): PortfolioEntity {
         id: portfolio.id,
         name: portfolio.name,
         description: portfolio.description,
-        visibility: portfolio.visibility,
+        visibility: portfolio.visibility ?? "PUBLIC",
     };
 }
 
@@ -68,7 +68,8 @@ function toProjectEntity(project: Project): ProjectEntity {
         name: project.name,
         description: project.description,
         flagged: project.flagged,
-        visibility: project.visibility,
+        visibility: project.visibility ?? "PUBLIC",
+        status: project.status,
     };
 }
 

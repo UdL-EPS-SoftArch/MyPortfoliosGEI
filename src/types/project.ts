@@ -11,17 +11,21 @@ export interface ProjectEntity {
     flagged?: boolean;
     status?: Status;
     isPrivate?: boolean;
-    created?: string; // ZonedDateTime as string
-    lastModified?: string;
-    creator?: string; // URI of the user
-    moderator?: string; // URI of the user
-    project?: string; // URI of parent project
     visibility?: Visibility;
+    created?: string;
+    lastModified?: string;
+    creator?: string;
+    moderator?: string;
+    project?: string;
+    /** URI of the portfolio this project belongs to (optional). */
+    portfolio?: string;
 }
 
 export type Project = ProjectEntity & Resource;
 
 export function toPlainProject(project: Project): Project {
+    const isPrivate = project.isPrivate ?? (project.visibility === "PRIVATE" || project.visibility === "RESTRICTED");
+
     return {
         uri: project.uri,
         id: project.id,
@@ -29,12 +33,13 @@ export function toPlainProject(project: Project): Project {
         description: project.description,
         flagged: project.flagged,
         status: project.status,
-        isPrivate: project.isPrivate,
+        isPrivate,
         created: project.created,
         lastModified: project.lastModified,
         creator: project.creator,
         moderator: project.moderator,
         project: project.project,
         visibility: project.visibility,
+        portfolio: project.portfolio,
     } as Project;
 }

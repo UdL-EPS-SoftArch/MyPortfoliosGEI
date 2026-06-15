@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { Project } from "@/types/project";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 interface ProjectFormProps {
     initialData?: Project;
@@ -39,17 +39,22 @@ export function ProjectForm({ initialData, onSubmit }: ProjectFormProps) {
         defaultValues: initialData || { name: "", description: "", status: "ToDo", isPrivate: false },
     });
     const [loading, setLoading] = useState(false);
+    const submittingRef = useRef(false);
     const router = useRouter();
 
     const handleFormSubmit = async (data: Partial<Project>) => {
+        if (submittingRef.current) return;
+
+        submittingRef.current = true;
         setLoading(true);
         try {
             await onSubmit(data);
             router.push("/projects");
             router.refresh();
+            // Keep loading=true until navigation unmounts this component
         } catch {
             alert("Failed to save project.");
-        } finally {
+            submittingRef.current = false;
             setLoading(false);
         }
     };
